@@ -6,140 +6,76 @@
 <title>Order Manager PRO+</title>
 
 <style>
-body{
-  font-family:'Segoe UI',sans-serif;
-  background:#0f172a;
-  color:#fff;
-  margin:0;
-  padding:20px;
-}
+body{font-family:'Segoe UI',sans-serif;background:#0f172a;color:#fff;margin:0;padding:20px}
+h1{text-align:center}
 
-h1{text-align:center;}
+textarea{width:100%;height:140px;border-radius:10px;border:none;padding:10px;margin-bottom:10px}
+button{border:none;border-radius:8px;cursor:pointer}
 
-textarea{
-  width:100%;
-  height:140px;
-  border-radius:10px;
-  border:none;
-  padding:10px;
-  margin-bottom:10px;
-}
+.btn-main{width:100%;padding:10px;background:#22c55e;color:#fff}
 
-button{
-  border:none;
-  border-radius:8px;
-  cursor:pointer;
-}
+#clock{text-align:center;margin-top:10px;font-size:14px;color:#94a3b8}
 
-.btn-main{
-  width:100%;
-  padding:10px;
-  background:#22c55e;
-  color:#fff;
-}
-
-#clock{
-  text-align:center;
-  margin-top:10px;
-  font-size:14px;
-  color:#94a3b8;
-}
-
-.container{margin-top:20px;}
+.container{margin-top:20px}
 
 .card{
-  background:#1e293b;
-  padding:12px;
-  border-radius:12px;
-  margin-bottom:10px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+  background:#1e293b;padding:12px;border-radius:12px;margin-bottom:10px;
+  display:flex;justify-content:space-between;align-items:center
 }
 
-.card.proses{background:#78350f;}
-.card.selesai{background:#064e3b;}
+.card.proses{background:#78350f}
+.card.selesai{background:#064e3b}
 
-.card.today{
-  border:2px solid #ef4444;
-  box-shadow:0 0 10px #ef4444;
-}
+.card.today{border:2px solid #ef4444}
+.card.tomorrow{border:2px solid #f59e0b}
 
-.card.tomorrow{
-  border:2px solid #f59e0b;
-  box-shadow:0 0 10px #f59e0b;
-}
-
-/* 🔥 BLINK CARD */
-@keyframes blinkRed {
-  0% { box-shadow: 0 0 5px #ef4444; }
-  50% { box-shadow: 0 0 20px #ef4444; }
-  100% { box-shadow: 0 0 5px #ef4444; }
+/* BLINK */
+@keyframes blinkRed{
+  0%{box-shadow:0 0 5px #ef4444}
+  50%{box-shadow:0 0 20px #ef4444}
+  100%{box-shadow:0 0 5px #ef4444}
 }
 
 .super-priority{
-  animation: blinkRed 1s infinite;
-  border:2px solid #ef4444 !important;
+  animation:blinkRed 1s infinite;
+  border:2px solid #ef4444!important;
 }
 
-/* 🔥 URGENT TEXT */
+/* TEXT URGENT */
 .urgent-big{
   display:block;
   font-size:12px;
   font-weight:bold;
   color:#ef4444;
   margin-bottom:4px;
-  letter-spacing:1px;
-  animation: blinkText 1s infinite;
+  animation:blinkText 1s infinite;
 }
 
 @keyframes blinkText{
   0%{opacity:1}
-  50%{opacity:0.3}
+  50%{opacity:.3}
   100%{opacity:1}
 }
 
-.left{flex:1;}
-.title{font-size:14px;}
+.left{flex:1}
+.title{font-size:14px}
 
-.progress{
-  font-size:11px;
-  padding:3px 6px;
-  border-radius:6px;
-  margin-left:6px;
-}
+.progress{font-size:11px;padding:3px 6px;border-radius:6px;margin-left:6px}
+.p-belum{background:#64748b}
+.p-proses{background:#f59e0b}
+.p-selesai{background:#22c55e}
 
-.p-belum{background:#64748b;}
-.p-proses{background:#f59e0b;}
-.p-selesai{background:#22c55e;}
+.tag{font-size:11px;padding:2px 6px;border-radius:6px;margin-right:5px}
+.todayTag{background:#ef4444}
+.tomorrowTag{background:#f59e0b}
 
-.tag{
-  font-size:11px;
-  padding:2px 6px;
-  border-radius:6px;
-  margin-right:5px;
-}
+.date{font-size:11px;color:#94a3b8}
 
-.todayTag{background:#ef4444;}
-.tomorrowTag{background:#f59e0b;}
+.actions{display:flex;gap:5px}
+.actions button{padding:5px 6px;font-size:11px}
 
-.date{
-  font-size:11px;
-  color:#94a3b8;
-}
-
-.actions{
-  display:flex;
-  gap:5px;
-}
-
-.actions button{
-  padding:5px 6px;
-  font-size:11px;
-}
-
-.edit{background:#3b82f6;color:#fff;}
-.delete{background:#ef4444;color:#fff;}
+.edit{background:#3b82f6;color:#fff}
+.delete{background:#ef4444;color:#fff}
 </style>
 </head>
 
@@ -147,7 +83,7 @@ button{
 
 <h1>📦 Order Manager PRO+</h1>
 
-<textarea id="input" placeholder="Paste data order..."></textarea>
+<textarea id="input"></textarea>
 <button class="btn-main" onclick="tambah()">Tambah</button>
 
 <div id="clock"></div>
@@ -158,159 +94,138 @@ button{
 let data = JSON.parse(localStorage.getItem("orders") || "[]")
 
 function genId(){
-  return Date.now().toString(36) + Math.random().toString(36).substr(2)
+  return Date.now().toString(36)+Math.random().toString(36).slice(2)
 }
 
-/* PARSE TANGGAL */
+/* NORMALIZE DATE */
+function normalize(d){
+  if(!d) return null
+  let x = new Date(d)
+  x.setHours(0,0,0,0)
+  return x
+}
+
+/* PARSE */
 function parseTanggal(text){
   if(!text) return null
 
-  const bulan = {
+  const bulan={
     januari:0,februari:1,maret:2,april:3,mei:4,juni:5,
     juli:6,agustus:7,september:8,oktober:9,november:10,desember:11
   }
 
-  text = text.toLowerCase()
+  text=text.toLowerCase()
 
-  let m = text.match(/(\d{1,2})\s*(januari|februari|maret|april|mei|juni|juli|agustus|september|oktober|november|desember)/)
+  let m=text.match(/(\d{1,2})\s*(januari|februari|maret|april|mei|juni|juli|agustus|september|oktober|november|desember)/)
   if(m){
-    let now = new Date()
-    let year = now.getFullYear()
-    let d = new Date(year, bulan[m[2]], parseInt(m[1]))
-    if(d < now) d.setFullYear(year + 1)
-    return d
+    let now=new Date()
+    let d=new Date(now.getFullYear(),bulan[m[2]],parseInt(m[1]))
+    if(d<now) d.setFullYear(now.getFullYear()+1)
+    return normalize(d)
   }
 
-  const hariMap = {minggu:0,senin:1,selasa:2,rabu:3,kamis:4,jumat:5,sabtu:6}
-  let now = new Date()
+  const hariMap={minggu:0,senin:1,selasa:2,rabu:3,kamis:4,jumat:5,sabtu:6}
+  let now=new Date()
 
   for(let h in hariMap){
     if(text.includes(h)){
-      let target = hariMap[h]
-      let diff = (target - now.getDay() + 7) % 7
-      if(diff === 0) diff = 7
-      return new Date(now.getTime() + diff*86400000)
+      let diff=(hariMap[h]-now.getDay()+7)%7
+      if(diff===0) diff=7
+      return normalize(new Date(now.getTime()+diff*86400000))
     }
   }
 
   return null
 }
 
-/* STATUS HARI */
+/* DAY STATUS */
 function getDayStatus(date){
   if(!date) return ""
-  let t = new Date(); t.setHours(0,0,0,0)
-  let d = new Date(date); d.setHours(0,0,0,0)
-  let diff = (d - t)/(86400000)
-  if(diff === 0) return "today"
-  if(diff === 1) return "tomorrow"
+  let today=normalize(new Date())
+  let diff=(date-today)/86400000
+  if(diff===0) return "today"
+  if(diff===1) return "tomorrow"
   return ""
 }
 
-/* SORT SUPER PRIORITAS */
+/* SORT */
 function sortPrioritas(){
-  data = data
-    .map((d,i)=>({ ...d, _i:i }))
-    .sort((a,b)=>{
-      let da = parseTanggal(a.text)
-      let db = parseTanggal(b.text)
+  data=data.map((d,i)=>({...d,_i:i})).sort((a,b)=>{
+    let da=parseTanggal(a.text)
+    let db=parseTanggal(b.text)
 
-      let dayA = getDayStatus(da)
-      let dayB = getDayStatus(db)
+    let dayA=getDayStatus(da)
+    let dayB=getDayStatus(db)
 
-      const getRank = (item, day)=>{
-        if(item.progress === "proses" && day === "today") return 0
-        if(item.progress === "proses") return 1
-        if(item.progress === "belum") return 2
-        if(item.progress === "selesai") return 3
-        return 2
-      }
+    const rank=(x,day)=>{
+      if(x.progress==="proses"&&day==="today") return 0
+      if(x.progress==="proses") return 1
+      if(x.progress==="belum") return 2
+      if(x.progress==="selesai") return 3
+      return 2
+    }
 
-      let pa = getRank(a, dayA)
-      let pb = getRank(b, dayB)
+    let pa=rank(a,dayA)
+    let pb=rank(b,dayB)
+    if(pa!==pb) return pa-pb
 
-      if(pa !== pb) return pa - pb
+    if(!da&&!db) return a._i-b._i
+    if(!da) return -1
+    if(!db) return 1
 
-      if(!da && !db) return a._i - b._i
-      if(!da) return -1
-      if(!db) return 1
+    if(da-db!==0) return da-db
 
-      let diff = da - db
-      if(diff !== 0) return diff
-
-      return a._i - b._i
-    })
-    .map(({_i,...rest})=>rest)
+    return a._i-b._i
+  }).map(({_i,...r})=>r)
 }
 
-/* TAMBAH */
+/* CRUD */
 function tambah(){
-  let lines = document.getElementById("input").value.split("\n")
-
-  lines.forEach(x=>{
+  document.getElementById("input").value.split("\n").forEach(x=>{
     if(x.trim()){
-      data.push({
-        id: genId(),
-        text: x.trim(),
-        progress:"belum"
-      })
+      data.push({id:genId(),text:x.trim(),progress:"belum"})
     }
   })
-
-  sortPrioritas()
-  simpan()
-  render()
+  sortPrioritas();simpan();render()
   document.getElementById("input").value=""
 }
 
-/* HAPUS */
 function hapus(id){
-  data = data.filter(x=>x.id!==id)
-  sortPrioritas()
-  simpan()
-  render()
+  data=data.filter(x=>x.id!==id)
+  sortPrioritas();simpan();render()
 }
 
-/* EDIT */
 function edit(id){
-  let item = data.find(x=>x.id===id)
+  let item=data.find(x=>x.id===id)
   if(!item) return
-
-  let baru = prompt("Edit order:", item.text)
-  if(baru && baru.trim()){
-    item.text = baru.trim()
-    sortPrioritas()
-    simpan()
-    render()
+  let baru=prompt("Edit:",item.text)
+  if(baru&&baru.trim()){
+    item.text=baru.trim()
+    sortPrioritas();simpan();render()
   }
 }
 
-/* UPDATE PROGRESS */
 function updateProgress(id,val){
-  let item = data.find(x=>x.id===id)
+  let item=data.find(x=>x.id===id)
   if(!item) return
-
-  item.progress = val
-  sortPrioritas()
-  simpan()
-  render()
+  item.progress=val
+  sortPrioritas();simpan();render()
 }
 
 /* RENDER */
 function render(){
   let html=""
-
   data.forEach(d=>{
-    let date = parseTanggal(d.text)
-    let day = getDayStatus(date)
-    let isSuper = (d.progress === "proses" && day === "today")
+    let date=parseTanggal(d.text)
+    let day=getDayStatus(date)
+    let isSuper=(d.progress==="proses"&&day==="today")
 
     html+=`
-    <div class="card ${d.progress} ${day} ${isSuper ? 'super-priority' : ''}">
+    <div class="card ${d.progress} ${day} ${isSuper?'super-priority':''}">
       <div class="left">
         <div class="title">
 
-          ${isSuper ? '<span class="urgent-big">⚠️ URGENT</span>' : ''}
+          ${isSuper?'<span class="urgent-big">⚠️ URGENT</span>':''}
 
           ${
             day==="today" ? '<span class="tag todayTag">🔴 HARI INI</span>' :
@@ -319,7 +234,7 @@ function render(){
 
           ${d.text}
 
-          <select class="progress p-${d.progress}" onchange="updateProgress('${d.id}', this.value)">
+          <select class="progress p-${d.progress}" onchange="updateProgress('${d.id}',this.value)">
             <option value="belum" ${d.progress==="belum"?"selected":""}>Belum</option>
             <option value="proses" ${d.progress==="proses"?"selected":""}>Proses</option>
             <option value="selesai" ${d.progress==="selesai"?"selected":""}>Selesai</option>
@@ -327,7 +242,7 @@ function render(){
         </div>
 
         <div class="date">
-          ${date ? date.toLocaleDateString("id-ID",{weekday:'long',day:'numeric',month:'long'}) : "Tidak ada tanggal"}
+          ${date?date.toLocaleDateString("id-ID",{weekday:'long',day:'numeric',month:'long'}):"Tidak ada tanggal"}
         </div>
       </div>
 
@@ -335,24 +250,19 @@ function render(){
         <button class="edit" onclick="edit('${d.id}')">✏️</button>
         <button class="delete" onclick="hapus('${d.id}')">🗑️</button>
       </div>
-    </div>
-    `
+    </div>`
   })
 
-  document.getElementById("output").innerHTML = html
+  document.getElementById("output").innerHTML=html
 }
 
 /* CLOCK */
-function updateClock(){
-  document.getElementById("clock").innerText =
-    new Date().toLocaleString("id-ID")
-}
-
-setInterval(updateClock,1000)
-updateClock()
+setInterval(()=>{
+  document.getElementById("clock").innerText=new Date().toLocaleString("id-ID")
+},1000)
 
 function simpan(){
-  localStorage.setItem("orders", JSON.stringify(data))
+  localStorage.setItem("orders",JSON.stringify(data))
 }
 
 render()
