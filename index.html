@@ -29,7 +29,7 @@ button{border:none;border-radius:8px;cursor:pointer}
 .card.today{border:2px solid #ef4444}
 .card.tomorrow{border:2px solid #f59e0b}
 
-/* BLINK */
+/* 🔴 BLINK */
 @keyframes blinkRed{
   0%{box-shadow:0 0 5px #ef4444}
   50%{box-shadow:0 0 20px #ef4444}
@@ -41,7 +41,7 @@ button{border:none;border-radius:8px;cursor:pointer}
   border:2px solid #ef4444!important;
 }
 
-/* TEXT URGENT */
+/* 🔥 URGENT TEXT */
 .urgent-big{
   display:block;
   font-size:12px;
@@ -83,7 +83,7 @@ button{border:none;border-radius:8px;cursor:pointer}
 
 <h1>📦 Order Manager PRO+</h1>
 
-<textarea id="input"></textarea>
+<textarea id="input" placeholder="Paste data order..."></textarea>
 <button class="btn-main" onclick="tambah()">Tambah</button>
 
 <div id="clock"></div>
@@ -93,19 +93,29 @@ button{border:none;border-radius:8px;cursor:pointer}
 <script>
 let data = JSON.parse(localStorage.getItem("orders") || "[]")
 
+/* ID */
 function genId(){
   return Date.now().toString(36)+Math.random().toString(36).slice(2)
+}
+
+/* NORMALIZE TEXT (ANTI DUPLIKAT) */
+function normalizeText(text){
+  return text
+    .toLowerCase()
+    .replace(/[^\w\s]/g,'')
+    .replace(/\s+/g,' ')
+    .trim()
 }
 
 /* NORMALIZE DATE */
 function normalize(d){
   if(!d) return null
-  let x = new Date(d)
+  let x=new Date(d)
   x.setHours(0,0,0,0)
   return x
 }
 
-/* PARSE */
+/* PARSE TANGGAL */
 function parseTanggal(text){
   if(!text) return null
 
@@ -138,7 +148,7 @@ function parseTanggal(text){
   return null
 }
 
-/* DAY STATUS */
+/* STATUS HARI */
 function getDayStatus(date){
   if(!date) return ""
   let today=normalize(new Date())
@@ -148,7 +158,7 @@ function getDayStatus(date){
   return ""
 }
 
-/* SORT */
+/* SORT PRIORITAS */
 function sortPrioritas(){
   data=data.map((d,i)=>({...d,_i:i})).sort((a,b)=>{
     let da=parseTanggal(a.text)
@@ -179,42 +189,70 @@ function sortPrioritas(){
   }).map(({_i,...r})=>r)
 }
 
-/* CRUD */
+/* TAMBAH + ANTI DUPLIKAT */
 function tambah(){
-  document.getElementById("input").value.split("\n").forEach(x=>{
-    if(x.trim()){
-      data.push({id:genId(),text:x.trim(),progress:"belum"})
+  let lines=document.getElementById("input").value.split("\n")
+
+  lines.forEach(x=>{
+    let clean=x.trim()
+    if(!clean) return
+
+    let newText=normalizeText(clean)
+
+    let sudahAda=data.some(d=>normalizeText(d.text)===newText)
+
+    if(!sudahAda){
+      data.push({
+        id:genId(),
+        text:clean,
+        progress:"belum"
+      })
     }
   })
-  sortPrioritas();simpan();render()
+
+  sortPrioritas()
+  simpan()
+  render()
   document.getElementById("input").value=""
 }
 
+/* HAPUS */
 function hapus(id){
   data=data.filter(x=>x.id!==id)
-  sortPrioritas();simpan();render()
+  sortPrioritas()
+  simpan()
+  render()
 }
 
+/* EDIT */
 function edit(id){
   let item=data.find(x=>x.id===id)
   if(!item) return
+
   let baru=prompt("Edit:",item.text)
   if(baru&&baru.trim()){
     item.text=baru.trim()
-    sortPrioritas();simpan();render()
+    sortPrioritas()
+    simpan()
+    render()
   }
 }
 
+/* UPDATE PROGRESS */
 function updateProgress(id,val){
   let item=data.find(x=>x.id===id)
   if(!item) return
+
   item.progress=val
-  sortPrioritas();simpan();render()
+  sortPrioritas()
+  simpan()
+  render()
 }
 
 /* RENDER */
 function render(){
   let html=""
+
   data.forEach(d=>{
     let date=parseTanggal(d.text)
     let day=getDayStatus(date)
