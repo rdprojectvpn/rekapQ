@@ -55,16 +55,11 @@ button{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  cursor:grab;
-  transition:0.2s;
 }
-
-.card.dragging{opacity:0.5;}
 
 .card.proses{background:#78350f;}
 .card.selesai{background:#064e3b;}
 
-/* 🔥 REMINDER */
 .card.today{
   border:2px solid #ef4444;
   box-shadow:0 0 10px #ef4444;
@@ -73,6 +68,35 @@ button{
 .card.tomorrow{
   border:2px solid #f59e0b;
   box-shadow:0 0 10px #f59e0b;
+}
+
+/* 🔥 BLINK CARD */
+@keyframes blinkRed {
+  0% { box-shadow: 0 0 5px #ef4444; }
+  50% { box-shadow: 0 0 20px #ef4444; }
+  100% { box-shadow: 0 0 5px #ef4444; }
+}
+
+.super-priority{
+  animation: blinkRed 1s infinite;
+  border:2px solid #ef4444 !important;
+}
+
+/* 🔥 URGENT TEXT */
+.urgent-big{
+  display:block;
+  font-size:12px;
+  font-weight:bold;
+  color:#ef4444;
+  margin-bottom:4px;
+  letter-spacing:1px;
+  animation: blinkText 1s infinite;
+}
+
+@keyframes blinkText{
+  0%{opacity:1}
+  50%{opacity:0.3}
+  100%{opacity:1}
 }
 
 .left{flex:1;}
@@ -95,11 +119,6 @@ button{
   border-radius:6px;
   margin-right:5px;
 }
-
-.urgent{background:#ef4444;}
-.soon{background:#f59e0b;}
-.normal{background:#64748b;}
-.doneTag{background:#22c55e;}
 
 .todayTag{background:#ef4444;}
 .tomorrowTag{background:#f59e0b;}
@@ -138,213 +157,203 @@ button{
 <script>
 let data = JSON.parse(localStorage.getItem("orders") || "[]")
 
+function genId(){
+  return Date.now().toString(36) + Math.random().toString(36).substr(2)
+}
+
+/* PARSE TANGGAL */
 function parseTanggal(text){
+  if(!text) return null
+
   const bulan = {
     januari:0,februari:1,maret:2,april:3,mei:4,juni:5,
     juli:6,agustus:7,september:8,oktober:9,november:10,desember:11
   }
 
-  let m = text.toLowerCase().match(/(\d{1,2})\s*(januari|februari|maret|april|mei|juni|juli|agustus|september|oktober|november|desember)/)
-  if(m) return new Date(2026, bulan[m[2]], m[1])
+  text = text.toLowerCase()
 
-  if(text.toLowerCase().includes("senin")) return new Date(Date.now()+1*86400000)
-  if(text.toLowerCase().includes("rabu")) return new Date(Date.now()+3*86400000)
-  if(text.toLowerCase().includes("jumat")) return new Date(Date.now()+5*86400000)
+  let m = text.match(/(\d{1,2})\s*(januari|februari|maret|april|mei|juni|juli|agustus|september|oktober|november|desember)/)
+  if(m){
+    let now = new Date()
+    let year = now.getFullYear()
+    let d = new Date(year, bulan[m[2]], parseInt(m[1]))
+    if(d < now) d.setFullYear(year + 1)
+    return d
+  }
+
+  const hariMap = {minggu:0,senin:1,selasa:2,rabu:3,kamis:4,jumat:5,sabtu:6}
+  let now = new Date()
+
+  for(let h in hariMap){
+    if(text.includes(h)){
+      let target = hariMap[h]
+      let diff = (target - now.getDay() + 7) % 7
+      if(diff === 0) diff = 7
+      return new Date(now.getTime() + diff*86400000)
+    }
+  }
 
   return null
 }
 
-/* 🔥 DETEKSI HARI H & BESOK */
+/* STATUS HARI */
 function getDayStatus(date){
   if(!date) return ""
-
-  let today = new Date()
-  today.setHours(0,0,0,0)
-
-  let d = new Date(date)
-  d.setHours(0,0,0,0)
-
-  let diff = (d - today)/(1000*60*60*24)
-
+  let t = new Date(); t.setHours(0,0,0,0)
+  let d = new Date(date); d.setHours(0,0,0,0)
+  let diff = (d - t)/(86400000)
   if(diff === 0) return "today"
   if(diff === 1) return "tomorrow"
   return ""
 }
 
-function getStatus(date, progress){
-  if(progress === "selesai") return "done"
-  if(!date) return "normal"
+/* SORT SUPER PRIORITAS */
+function sortPrioritas(){
+  data = data
+    .map((d,i)=>({ ...d, _i:i }))
+    .sort((a,b)=>{
+      let da = parseTanggal(a.text)
+      let db = parseTanggal(b.text)
 
-  let diff = (date - new Date())/(1000*60*60*24)
+      let dayA = getDayStatus(da)
+      let dayB = getDayStatus(db)
 
-  if(diff <= 1) return "urgent"
-  if(diff <= 3) return "soon"
-  return "normal"
+      const getRank = (item, day)=>{
+        if(item.progress === "proses" && day === "today") return 0
+        if(item.progress === "proses") return 1
+        if(item.progress === "belum") return 2
+        if(item.progress === "selesai") return 3
+        return 2
+      }
+
+      let pa = getRank(a, dayA)
+      let pb = getRank(b, dayB)
+
+      if(pa !== pb) return pa - pb
+
+      if(!da && !db) return a._i - b._i
+      if(!da) return -1
+      if(!db) return 1
+
+      let diff = da - db
+      if(diff !== 0) return diff
+
+      return a._i - b._i
+    })
+    .map(({_i,...rest})=>rest)
 }
 
+/* TAMBAH */
 function tambah(){
-  let input = document.getElementById("input").value.split("\n")
+  let lines = document.getElementById("input").value.split("\n")
 
-  input.forEach(x=>{
+  lines.forEach(x=>{
     if(x.trim()){
       data.push({
-        id: Date.now() + Math.random(),
-        text: x,
+        id: genId(),
+        text: x.trim(),
         progress:"belum"
       })
     }
   })
 
-  document.getElementById("input").value=""
+  sortPrioritas()
   simpan()
   render()
+  document.getElementById("input").value=""
 }
 
-function simpan(){
-  localStorage.setItem("orders", JSON.stringify(data))
-}
-
+/* HAPUS */
 function hapus(id){
   data = data.filter(x=>x.id!==id)
+  sortPrioritas()
   simpan()
   render()
 }
 
+/* EDIT */
 function edit(id){
   let item = data.find(x=>x.id===id)
+  if(!item) return
+
   let baru = prompt("Edit order:", item.text)
-  if(baru){
-    item.text = baru
+  if(baru && baru.trim()){
+    item.text = baru.trim()
+    sortPrioritas()
     simpan()
     render()
   }
 }
 
+/* UPDATE PROGRESS */
 function updateProgress(id,val){
   let item = data.find(x=>x.id===id)
+  if(!item) return
+
   item.progress = val
+  sortPrioritas()
   simpan()
   render()
 }
 
+/* RENDER */
 function render(){
-  let list = data.map(d=>{
-    let date = parseTanggal(d.text)
-    return {...d, date, status:getStatus(date,d.progress), day:getDayStatus(date)}
-  })
-
-  list.sort((a,b)=>{
-    if(a.progress==="selesai" && b.progress!=="selesai") return 1
-    if(a.progress!=="selesai" && b.progress==="selesai") return -1
-    if(!a.date) return -1
-    if(!b.date) return 1
-    return a.date - b.date
-  })
-
   let html=""
 
-  list.forEach((d,i)=>{
+  data.forEach(d=>{
+    let date = parseTanggal(d.text)
+    let day = getDayStatus(date)
+    let isSuper = (d.progress === "proses" && day === "today")
+
     html+=`
-    <div class="card ${d.progress} ${d.day}" draggable="true" data-index="${i}">
+    <div class="card ${d.progress} ${day} ${isSuper ? 'super-priority' : ''}">
       <div class="left">
         <div class="title">
 
-          ${
-            d.day==="today" ? '<span class="tag todayTag">🔴 HARI INI</span>' :
-            d.day==="tomorrow" ? '<span class="tag tomorrowTag">🟠 BESOK</span>' : ''
-          }
+          ${isSuper ? '<span class="urgent-big">⚠️ URGENT</span>' : ''}
 
-          <span class="tag ${
-            d.status=="done"?"doneTag":
-            d.status=="urgent"?"urgent":
-            d.status=="soon"?"soon":"normal"
-          }">
-            ${
-              d.status=="done"?"🟢":
-              d.status=="urgent"?"🔴":
-              d.status=="soon"?"🟡":"⚪"
-            }
-          </span>
+          ${
+            day==="today" ? '<span class="tag todayTag">🔴 HARI INI</span>' :
+            day==="tomorrow" ? '<span class="tag tomorrowTag">🟠 BESOK</span>' : ''
+          }
 
           ${d.text}
 
-          <select class="progress p-${d.progress}" onchange="updateProgress(${d.id}, this.value)">
-            <option value="belum" ${d.progress=="belum"?"selected":""}>Belum</option>
-            <option value="proses" ${d.progress=="proses"?"selected":""}>Proses</option>
-            <option value="selesai" ${d.progress=="selesai"?"selected":""}>Selesai</option>
+          <select class="progress p-${d.progress}" onchange="updateProgress('${d.id}', this.value)">
+            <option value="belum" ${d.progress==="belum"?"selected":""}>Belum</option>
+            <option value="proses" ${d.progress==="proses"?"selected":""}>Proses</option>
+            <option value="selesai" ${d.progress==="selesai"?"selected":""}>Selesai</option>
           </select>
         </div>
 
         <div class="date">
-          ${d.date ? d.date.toDateString() : "Tidak ada tanggal"}
+          ${date ? date.toLocaleDateString("id-ID",{weekday:'long',day:'numeric',month:'long'}) : "Tidak ada tanggal"}
         </div>
       </div>
 
       <div class="actions">
-        <button class="edit" onclick="edit(${d.id})">✏️</button>
-        <button class="delete" onclick="hapus(${d.id})">🗑️</button>
+        <button class="edit" onclick="edit('${d.id}')">✏️</button>
+        <button class="delete" onclick="hapus('${d.id}')">🗑️</button>
       </div>
     </div>
     `
   })
 
   document.getElementById("output").innerHTML = html
-
-  dragInit()
-}
-
-/* DRAG */
-function dragInit(){
-  const cards = document.querySelectorAll('.card')
-  let dragIndex = null
-
-  cards.forEach(card=>{
-    card.addEventListener('dragstart',()=>{
-      dragIndex = card.dataset.index
-      card.classList.add('dragging')
-    })
-
-    card.addEventListener('dragend',()=>{
-      card.classList.remove('dragging')
-    })
-
-    card.addEventListener('dragover',(e)=>e.preventDefault())
-
-    card.addEventListener('drop',()=>{
-      let dropIndex = card.dataset.index
-
-      let temp = data[dragIndex]
-      data.splice(dragIndex,1)
-      data.splice(dropIndex,0,temp)
-
-      simpan()
-      render()
-    })
-  })
 }
 
 /* CLOCK */
 function updateClock(){
-  const now = new Date()
-
-  const hari = ["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"]
-  const bulan = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"]
-
-  let h = hari[now.getDay()]
-  let tgl = now.getDate()
-  let b = bulan[now.getMonth()]
-  let th = now.getFullYear()
-
-  let jam = now.getHours().toString().padStart(2,'0')
-  let menit = now.getMinutes().toString().padStart(2,'0')
-  let detik = now.getSeconds().toString().padStart(2,'0')
-
-  document.getElementById("clock").innerHTML =
-    `${h}, ${tgl} ${b} ${th} • ${jam}:${menit}:${detik}`
+  document.getElementById("clock").innerText =
+    new Date().toLocaleString("id-ID")
 }
 
 setInterval(updateClock,1000)
 updateClock()
+
+function simpan(){
+  localStorage.setItem("orders", JSON.stringify(data))
+}
 
 render()
 </script>
