@@ -1,116 +1,94 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-
-<title>Order Manager PRO MAX</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order Manager PRO+</title>
 
 <style>
-
-*{
-  box-sizing:border-box;
-}
-
 body{
-  margin:0;
-  padding:20px;
   font-family:'Segoe UI',sans-serif;
   background:#0f172a;
-  color:white;
+  color:#fff;
+  margin:0;
+  padding:20px
 }
 
-/* HEADER */
 h1{
-  text-align:center;
-  margin-bottom:10px;
+  text-align:center
 }
 
-.subtitle{
-  text-align:center;
-  color:#94a3b8;
-  margin-bottom:20px;
-  font-size:14px;
-}
-
-/* INPUT */
 textarea{
   width:100%;
-  height:130px;
+  height:140px;
+  border-radius:10px;
   border:none;
-  border-radius:14px;
-  padding:14px;
-  background:#1e293b;
-  color:white;
-  resize:none;
-  outline:none;
+  padding:10px;
   margin-bottom:10px;
-  font-size:14px;
+  background:#1e293b;
+  color:#fff;
+}
+
+button{
+  border:none;
+  border-radius:8px;
+  cursor:pointer
 }
 
 .btn-main{
   width:100%;
-  padding:13px;
-  border:none;
-  border-radius:12px;
+  padding:10px;
   background:#22c55e;
-  color:white;
-  font-weight:bold;
-  font-size:15px;
-  cursor:pointer;
+  color:#fff;
+  font-weight:bold
 }
 
-.btn-main:hover{
-  opacity:.9;
-}
-
-/* CLOCK */
 #clock{
-  margin-top:15px;
   text-align:center;
-  color:#94a3b8;
+  margin-top:10px;
   font-size:14px;
+  color:#94a3b8
 }
 
-/* LIST */
 .container{
-  margin-top:20px;
+  margin-top:20px
 }
 
 .card{
   background:#1e293b;
-  border-radius:16px;
-  padding:14px;
-  margin-bottom:12px;
+  padding:12px;
+  border-radius:12px;
+  margin-bottom:10px;
   display:flex;
   justify-content:space-between;
-  gap:10px;
-  align-items:flex-start;
-  transition:.3s;
+  align-items:center;
+  transition:.3s
 }
 
 .card.proses{
-  background:#78350f;
+  background:#78350f
 }
 
 .card.selesai{
-  background:#064e3b;
+  background:#064e3b
 }
 
-/* PRIORITY COLORS */
+/* TODAY */
 .card.today{
-  border:2px solid #ef4444;
+  border:2px solid #ef4444
 }
 
+/* TOMORROW */
 .card.tomorrow{
-  border:2px solid #f59e0b;
+  border:2px solid #f59e0b
 }
 
+/* H-2 */
 .card.h2{
-  border:2px solid #3b82f6;
+  border:2px solid #3b82f6
 }
 
-/* SUPER PRIORITY */
+/* BLINK */
 @keyframes blinkRed{
   0%{box-shadow:0 0 5px #ef4444}
   50%{box-shadow:0 0 20px #ef4444}
@@ -119,140 +97,121 @@ textarea{
 
 .super-priority{
   animation:blinkRed 1s infinite;
+  border:2px solid #ef4444!important
 }
 
-/* BLINK TEXT */
+/* URGENT TEXT */
+.urgent-big{
+  display:block;
+  font-size:12px;
+  font-weight:bold;
+  color:#ef4444;
+  margin-bottom:4px;
+  animation:blinkText 1s infinite
+}
+
 @keyframes blinkText{
   0%{opacity:1}
   50%{opacity:.3}
   100%{opacity:1}
 }
 
-.urgent-big{
-  display:block;
-  color:#ef4444;
-  font-size:12px;
-  font-weight:bold;
-  margin-bottom:5px;
-  animation:blinkText 1s infinite;
-}
-
-/* CONTENT */
 .left{
-  flex:1;
+  flex:1
 }
 
 .title{
-  line-height:1.7;
   font-size:14px;
+  line-height:1.7
 }
 
-/* TAG */
-.tag{
-  display:inline-block;
-  padding:3px 8px;
-  border-radius:7px;
-  font-size:11px;
-  font-weight:bold;
-  margin-right:5px;
-  margin-bottom:5px;
-}
-
-.todayTag{
-  background:#ef4444;
-}
-
-.tomorrowTag{
-  background:#f59e0b;
-}
-
-.h2Tag{
-  background:#3b82f6;
-}
-
-/* COUNTDOWN */
-.countdown{
-  margin-top:6px;
-  color:#38bdf8;
-  font-size:11px;
-}
-
-/* DATE */
-.date{
-  margin-top:5px;
-  font-size:11px;
-  color:#94a3b8;
-}
-
-/* STATUS */
 .progress{
-  margin-left:8px;
-  border:none;
-  border-radius:8px;
-  padding:4px 6px;
   font-size:11px;
-  color:white;
+  padding:3px 6px;
+  border-radius:6px;
+  margin-left:6px;
+  border:none;
+  color:#fff
 }
 
 .p-belum{
-  background:#64748b;
+  background:#64748b
 }
 
 .p-proses{
-  background:#f59e0b;
+  background:#f59e0b
 }
 
 .p-selesai{
-  background:#22c55e;
+  background:#22c55e
 }
 
-/* BUTTON */
+.tag{
+  font-size:11px;
+  padding:2px 6px;
+  border-radius:6px;
+  margin-right:5px;
+  font-weight:bold;
+  display:inline-block;
+  margin-bottom:4px
+}
+
+.todayTag{
+  background:#ef4444
+}
+
+.tomorrowTag{
+  background:#f59e0b
+}
+
+.h2Tag{
+  background:#3b82f6
+}
+
+.date{
+  font-size:11px;
+  color:#94a3b8;
+  margin-top:4px
+}
+
+.countdown{
+  font-size:11px;
+  color:#38bdf8;
+  margin-top:4px
+}
+
 .actions{
   display:flex;
-  flex-direction:column;
-  gap:6px;
+  gap:5px
 }
 
 .actions button{
-  border:none;
-  border-radius:8px;
-  padding:7px;
-  cursor:pointer;
-  color:white;
+  padding:5px 6px;
+  font-size:11px
 }
 
 .edit{
   background:#3b82f6;
+  color:#fff
 }
 
 .delete{
   background:#ef4444;
+  color:#fff
 }
-
-.empty{
-  text-align:center;
-  color:#94a3b8;
-  margin-top:30px;
-}
-
 </style>
 </head>
 
 <body>
 
-<h1>📦 Order Manager PRO MAX</h1>
-
-<div class="subtitle">
-Realtime deadline priority system
-</div>
+<h1>📦 Order Manager PRO+</h1>
 
 <textarea id="input" placeholder="Contoh:
 Servis motor 28 Mei 14:00
-Ambil barang 30 Mei 09:30
-Meeting client 1 Juni 20:00"></textarea>
+Meeting client 30 Mei 09:00"></textarea>
 
 <button class="btn-main" onclick="tambah()">
-Tambah Order
+Tambah
 </button>
 
 <div id="clock"></div>
@@ -261,29 +220,18 @@ Tambah Order
 
 <script>
 
-/* =========================
-   DATABASE
-========================= */
-
 let data = JSON.parse(
   localStorage.getItem("orders") || "[]"
 )
 
-/* =========================
-   GENERATE ID
-========================= */
-
+/* ID */
 function genId(){
   return Date.now().toString(36)
-    + Math.random().toString(36).slice(2)
+  + Math.random().toString(36).slice(2)
 }
 
-/* =========================
-   NORMALIZE TEXT
-========================= */
-
+/* NORMALIZE TEXT */
 function normalizeText(text){
-
   return text
     .toLowerCase()
     .replace(/[^\w\s]/g,'')
@@ -291,10 +239,19 @@ function normalizeText(text){
     .trim()
 }
 
-/* =========================
-   PARSE TANGGAL + JAM
-========================= */
+/* NORMALIZE DATE */
+function normalize(d){
 
+  if(!d) return null
+
+  let x=new Date(d)
+
+  x.setHours(0,0,0,0)
+
+  return x
+}
+
+/* PARSE TANGGAL + JAM */
 function parseTanggal(text){
 
   if(!text) return null
@@ -316,48 +273,41 @@ function parseTanggal(text){
 
   text=text.toLowerCase()
 
-  let match=text.match(
+  let m=text.match(
     /(\d{1,2})\s*(januari|februari|maret|april|mei|juni|juli|agustus|september|oktober|november|desember)(?:.*?(\d{1,2})[:.](\d{2}))?/
   )
 
-  if(match){
+  if(m){
 
     let now=new Date()
 
-    let hari=parseInt(match[1])
-
-    let bulanIndex=bulan[match[2]]
-
-    let jam=match[3]
-      ? parseInt(match[3])
+    let jam=m[3]
+      ? parseInt(m[3])
       : 0
 
-    let menit=match[4]
-      ? parseInt(match[4])
+    let menit=m[4]
+      ? parseInt(m[4])
       : 0
 
-    let result=new Date(
+    let d=new Date(
       now.getFullYear(),
-      bulanIndex,
-      hari,
+      bulan[m[2]],
+      parseInt(m[1]),
       jam,
       menit
     )
 
-    if(result < now){
-      result.setFullYear(now.getFullYear()+1)
+    if(d<now){
+      d.setFullYear(now.getFullYear()+1)
     }
 
-    return result
+    return d
   }
 
   return null
 }
 
-/* =========================
-   DAY STATUS
-========================= */
-
+/* STATUS HARI */
 function getDayStatus(date){
 
   if(!date) return ""
@@ -389,17 +339,40 @@ function getDayStatus(date){
   return ""
 }
 
-/* =========================
-   COUNTDOWN
-========================= */
+/* BADGE REALTIME */
+function getRealtimeBadge(date){
 
+  if(!date) return ""
+
+  let diff=date-new Date()
+
+  let jam=diff/3600000
+
+  if(diff<=0){
+    return '<span class="tag todayTag">⛔ LEWAT</span>'
+  }
+
+  if(jam<=1){
+    return '<span class="tag todayTag">🚨 <1 JAM</span>'
+  }
+
+  if(jam<=3){
+    return '<span class="tag todayTag">⚠️ <3 JAM</span>'
+  }
+
+  if(jam<=6){
+    return '<span class="tag tomorrowTag">⏰ <6 JAM</span>'
+  }
+
+  return ""
+}
+
+/* COUNTDOWN */
 function getCountdown(date){
 
   if(!date) return ""
 
-  let now=new Date()
-
-  let diff=date-now
+  let diff=date-new Date()
 
   if(diff<=0){
     return "⛔ Deadline terlewat"
@@ -426,57 +399,7 @@ function getCountdown(date){
   return `⏳ ${menit} menit lagi`
 }
 
-/* =========================
-   REALTIME BADGE
-========================= */
-
-function getRealtimeBadge(date){
-
-  if(!date) return ""
-
-  let diff=date-new Date()
-
-  let jam=diff/3600000
-
-  if(diff<=0){
-    return `
-    <span class="tag todayTag">
-    ⛔ LEWAT DEADLINE
-    </span>
-    `
-  }
-
-  if(jam<=1){
-    return `
-    <span class="tag todayTag">
-    🚨 <1 JAM
-    </span>
-    `
-  }
-
-  if(jam<=3){
-    return `
-    <span class="tag todayTag">
-    ⚠️ <3 JAM
-    </span>
-    `
-  }
-
-  if(jam<=6){
-    return `
-    <span class="tag tomorrowTag">
-    ⏰ <6 JAM
-    </span>
-    `
-  }
-
-  return ""
-}
-
-/* =========================
-   SORT PRIORITAS
-========================= */
-
+/* SORT PRIORITAS */
 function sortPrioritas(){
 
   data=data
@@ -484,12 +407,11 @@ function sortPrioritas(){
   .sort((a,b)=>{
 
     let da=parseTanggal(a.text)
-
     let db=parseTanggal(b.text)
 
     let now=new Date()
 
-    function getPriority(item,date){
+    function rank(item,date){
 
       if(!date) return 999
 
@@ -497,66 +419,42 @@ function sortPrioritas(){
 
       let jam=diff/3600000
 
-      /* OVERDUE */
-      if(diff<=0){
-        return 0
-      }
+      /* LEWAT */
+      if(diff<=0) return 0
 
       /* <1 JAM */
-      if(jam<=1){
-        return 1
-      }
+      if(jam<=1) return 1
 
       /* <3 JAM */
-      if(jam<=3){
-        return 2
-      }
+      if(jam<=3) return 2
 
       /* <6 JAM */
-      if(jam<=6){
-        return 3
-      }
+      if(jam<=6) return 3
 
       /* HARI INI */
-      if(jam<=24){
-        return 4
-      }
+      if(jam<=24) return 4
 
       /* BESOK */
-      if(jam<=48){
-        return 5
-      }
+      if(jam<=48) return 5
 
       /* H-2 */
-      if(jam<=72){
-        return 6
-      }
+      if(jam<=72) return 6
 
       /* PROSES */
-      if(item.progress==="proses"){
-        return 7
-      }
+      if(item.progress==="proses") return 7
 
       /* BELUM */
-      if(item.progress==="belum"){
-        return 8
-      }
+      if(item.progress==="belum") return 8
 
-      /* DONE */
       return 9
     }
 
-    let pa=getPriority(a,da)
+    let pa=rank(a,da)
+    let pb=rank(b,db)
 
-    let pb=getPriority(b,db)
+    if(pa!==pb) return pa-pb
 
-    if(pa!==pb){
-      return pa-pb
-    }
-
-    if(!da&&!db){
-      return a._i-b._i
-    }
+    if(!da&&!db) return a._i-b._i
 
     if(!da) return 1
 
@@ -564,14 +462,10 @@ function sortPrioritas(){
 
     return da-db
 
-  })
-  .map(({_i,...r})=>r)
+  }).map(({_i,...r})=>r)
 }
 
-/* =========================
-   ADD
-========================= */
-
+/* TAMBAH */
 function tambah(){
 
   let lines=document
@@ -579,9 +473,9 @@ function tambah(){
     .value
     .split("\n")
 
-  lines.forEach(line=>{
+  lines.forEach(x=>{
 
-    let clean=line.trim()
+    let clean=x.trim()
 
     if(!clean) return
 
@@ -611,35 +505,28 @@ function tambah(){
   document.getElementById("input").value=""
 }
 
-/* =========================
-   DELETE
-========================= */
-
+/* HAPUS */
 function hapus(id){
 
   data=data.filter(x=>x.id!==id)
+
+  sortPrioritas()
 
   simpan()
 
   render()
 }
 
-/* =========================
-   EDIT
-========================= */
-
+/* EDIT */
 function edit(id){
 
   let item=data.find(x=>x.id===id)
 
   if(!item) return
 
-  let baru=prompt(
-    "Edit order:",
-    item.text
-  )
+  let baru=prompt("Edit:",item.text)
 
-  if(baru && baru.trim()){
+  if(baru&&baru.trim()){
 
     item.text=baru.trim()
 
@@ -651,15 +538,10 @@ function edit(id){
   }
 }
 
-/* =========================
-   UPDATE STATUS
-========================= */
-
+/* UPDATE PROGRESS */
 function updateProgress(id,val){
 
-  let item=data.find(
-    x=>x.id===id
-  )
+  let item=data.find(x=>x.id===id)
 
   if(!item) return
 
@@ -672,36 +554,8 @@ function updateProgress(id,val){
   render()
 }
 
-/* =========================
-   SAVE
-========================= */
-
-function simpan(){
-
-  localStorage.setItem(
-    "orders",
-    JSON.stringify(data)
-  )
-}
-
-/* =========================
-   RENDER
-========================= */
-
+/* RENDER */
 function render(){
-
-  sortPrioritas()
-
-  if(data.length===0){
-
-    document.getElementById("output")
-    .innerHTML=`
-      <div class="empty">
-      Belum ada order
-      </div>
-    `
-    return
-  }
 
   let html=""
 
@@ -711,9 +565,9 @@ function render(){
 
     let day=getDayStatus(date)
 
-    let countdown=getCountdown(date)
-
     let realtime=getRealtimeBadge(date)
+
+    let countdown=getCountdown(date)
 
     let isSuper=false
 
@@ -729,55 +583,27 @@ function render(){
     }
 
     html+=`
-
-    <div class="
-      card
-      ${d.progress}
-      ${day}
-      ${isSuper ? 'super-priority' : ''}
-    ">
+    <div class="card ${d.progress} ${day} ${isSuper?'super-priority':''}">
 
       <div class="left">
 
-        ${
-          isSuper
-          ? `
-          <span class="urgent-big">
-          🚨 SUPER PRIORITAS
-          </span>
-          `
-          : ''
-        }
-
         <div class="title">
+
+          ${isSuper
+            ? '<span class="urgent-big">⚠️ SUPER PRIORITAS</span>'
+            : ''
+          }
 
           ${
             day==="today"
-            ? `
-            <span class="tag todayTag">
-            🔴 HARI INI
-            </span>
-            `
-            : ''
-          }
+              ? '<span class="tag todayTag">🔴 HARI INI</span>'
 
-          ${
-            day==="tomorrow"
-            ? `
-            <span class="tag tomorrowTag">
-            🟠 BESOK
-            </span>
-            `
-            : ''
-          }
+            : day==="tomorrow"
+              ? '<span class="tag tomorrowTag">🟠 BESOK</span>'
 
-          ${
-            day==="h2"
-            ? `
-            <span class="tag h2Tag">
-            🔵 H-2
-            </span>
-            `
+            : day==="h2"
+              ? '<span class="tag h2Tag">🔵 H-2</span>'
+
             : ''
           }
 
@@ -787,39 +613,28 @@ function render(){
 
           <select
             class="progress p-${d.progress}"
-            onchange="
-              updateProgress(
-                '${d.id}',
-                this.value
-              )
-            "
+            onchange="updateProgress('${d.id}',this.value)"
           >
 
             <option
               value="belum"
-              ${d.progress==="belum"
-                ?"selected":""
-              }
+              ${d.progress==="belum"?"selected":""}
             >
-            Belum
+              Belum
             </option>
 
             <option
               value="proses"
-              ${d.progress==="proses"
-                ?"selected":""
-              }
+              ${d.progress==="proses"?"selected":""}
             >
-            Proses
+              Proses
             </option>
 
             <option
               value="selesai"
-              ${d.progress==="selesai"
-                ?"selected":""
-              }
+              ${d.progress==="selesai"?"selected":""}
             >
-            Selesai
+              Selesai
             </option>
 
           </select>
@@ -830,29 +645,25 @@ function render(){
 
           ${
             date
-            ? date.toLocaleString(
-              "id-ID",
-              {
-                weekday:'long',
-                day:'numeric',
-                month:'long',
-                hour:'2-digit',
-                minute:'2-digit'
-              }
-            )
-            : 'Tidak ada tanggal'
+              ? date.toLocaleString(
+                  "id-ID",
+                  {
+                    weekday:'long',
+                    day:'numeric',
+                    month:'long',
+                    hour:'2-digit',
+                    minute:'2-digit'
+                  }
+                )
+              : "Tidak ada tanggal"
           }
 
         </div>
 
         ${
           date
-          ? `
-          <div class="countdown">
-          ${countdown}
-          </div>
-          `
-          : ''
+            ? `<div class="countdown">${countdown}</div>`
+            : ''
         }
 
       </div>
@@ -863,51 +674,44 @@ function render(){
           class="edit"
           onclick="edit('${d.id}')"
         >
-        ✏️
+          ✏️
         </button>
 
         <button
           class="delete"
           onclick="hapus('${d.id}')"
         >
-        🗑️
+          🗑️
         </button>
 
       </div>
 
-    </div>
-    `
+    </div>`
   })
 
-  document.getElementById("output")
-  .innerHTML=html
+  document.getElementById("output").innerHTML=html
 }
 
-/* =========================
-   CLOCK
-========================= */
-
+/* CLOCK */
 setInterval(()=>{
 
   document.getElementById("clock")
-  .innerText=
-    new Date().toLocaleString("id-ID")
+  .innerText=new Date()
+  .toLocaleString("id-ID")
 
 },1000)
 
-/* =========================
-   AUTO REFRESH
-========================= */
-
+/* AUTO REFRESH */
 setInterval(()=>{
-
   render()
-
 },60000)
 
-/* =========================
-   INIT
-========================= */
+function simpan(){
+  localStorage.setItem(
+    "orders",
+    JSON.stringify(data)
+  )
+}
 
 render()
 
