@@ -3,33 +3,99 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Order Manager PRO+</title>
+<title>Order Manager PRO++</title>
 
 <style>
-body{font-family:'Segoe UI',sans-serif;background:#0f172a;color:#fff;margin:0;padding:20px}
-h1{text-align:center}
-
-textarea{width:100%;height:140px;border-radius:10px;border:none;padding:10px;margin-bottom:10px}
-button{border:none;border-radius:8px;cursor:pointer}
-
-.btn-main{width:100%;padding:10px;background:#22c55e;color:#fff}
-
-#clock{text-align:center;margin-top:10px;font-size:14px;color:#94a3b8}
-
-.container{margin-top:20px}
-
-.card{
-  background:#1e293b;padding:12px;border-radius:12px;margin-bottom:10px;
-  display:flex;justify-content:space-between;align-items:center
+*{
+  box-sizing:border-box;
 }
 
-.card.proses{background:#78350f}
-.card.selesai{background:#064e3b}
+body{
+  font-family:'Segoe UI',sans-serif;
+  background:#0f172a;
+  color:#fff;
+  margin:0;
+  padding:20px;
+}
 
-.card.today{border:2px solid #ef4444}
-.card.tomorrow{border:2px solid #f59e0b}
+h1{
+  text-align:center;
+  margin-bottom:10px;
+}
 
-/* 🔴 BLINK */
+textarea{
+  width:100%;
+  height:140px;
+  border-radius:12px;
+  border:none;
+  padding:12px;
+  margin-bottom:10px;
+  background:#1e293b;
+  color:#fff;
+  resize:none;
+}
+
+button{
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+}
+
+.btn-main{
+  width:100%;
+  padding:12px;
+  background:#22c55e;
+  color:#fff;
+  font-size:15px;
+  font-weight:bold;
+}
+
+#clock{
+  text-align:center;
+  margin-top:12px;
+  font-size:14px;
+  color:#94a3b8;
+}
+
+.container{
+  margin-top:20px;
+}
+
+.card{
+  background:#1e293b;
+  padding:14px;
+  border-radius:14px;
+  margin-bottom:12px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  transition:.3s;
+}
+
+.card.proses{
+  background:#78350f;
+}
+
+.card.selesai{
+  background:#064e3b;
+}
+
+/* HARI H */
+.card.today{
+  border:2px solid #ef4444;
+}
+
+/* BESOK */
+.card.tomorrow{
+  border:2px solid #f59e0b;
+}
+
+/* H-2 */
+.card.h2{
+  border:2px solid #3b82f6;
+}
+
+/* SUPER URGENT */
 @keyframes blinkRed{
   0%{box-shadow:0 0 5px #ef4444}
   50%{box-shadow:0 0 20px #ef4444}
@@ -41,7 +107,13 @@ button{border:none;border-radius:8px;cursor:pointer}
   border:2px solid #ef4444!important;
 }
 
-/* 🔥 URGENT TEXT */
+/* TEXT BLINK */
+@keyframes blinkText{
+  0%{opacity:1}
+  50%{opacity:.3}
+  100%{opacity:1}
+}
+
 .urgent-big{
   display:block;
   font-size:12px;
@@ -51,54 +123,118 @@ button{border:none;border-radius:8px;cursor:pointer}
   animation:blinkText 1s infinite;
 }
 
-@keyframes blinkText{
-  0%{opacity:1}
-  50%{opacity:.3}
-  100%{opacity:1}
+.left{
+  flex:1;
 }
 
-.left{flex:1}
-.title{font-size:14px}
+.title{
+  font-size:14px;
+  line-height:1.6;
+}
 
-.progress{font-size:11px;padding:3px 6px;border-radius:6px;margin-left:6px}
-.p-belum{background:#64748b}
-.p-proses{background:#f59e0b}
-.p-selesai{background:#22c55e}
+.progress{
+  font-size:11px;
+  padding:4px 6px;
+  border-radius:6px;
+  margin-left:8px;
+  border:none;
+  color:#fff;
+}
 
-.tag{font-size:11px;padding:2px 6px;border-radius:6px;margin-right:5px}
-.todayTag{background:#ef4444}
-.tomorrowTag{background:#f59e0b}
+.p-belum{
+  background:#64748b;
+}
 
-.date{font-size:11px;color:#94a3b8}
+.p-proses{
+  background:#f59e0b;
+}
 
-.actions{display:flex;gap:5px}
-.actions button{padding:5px 6px;font-size:11px}
+.p-selesai{
+  background:#22c55e;
+}
 
-.edit{background:#3b82f6;color:#fff}
-.delete{background:#ef4444;color:#fff}
+.tag{
+  font-size:11px;
+  padding:3px 7px;
+  border-radius:6px;
+  margin-right:5px;
+  font-weight:bold;
+}
+
+.todayTag{
+  background:#ef4444;
+}
+
+.tomorrowTag{
+  background:#f59e0b;
+}
+
+.h2Tag{
+  background:#3b82f6;
+}
+
+.countdown{
+  font-size:11px;
+  color:#38bdf8;
+  margin-top:5px;
+}
+
+.date{
+  font-size:11px;
+  color:#94a3b8;
+  margin-top:4px;
+}
+
+.actions{
+  display:flex;
+  gap:5px;
+}
+
+.actions button{
+  padding:6px 8px;
+  font-size:11px;
+}
+
+.edit{
+  background:#3b82f6;
+  color:#fff;
+}
+
+.delete{
+  background:#ef4444;
+  color:#fff;
+}
 </style>
 </head>
 
 <body>
 
-<h1>📦 Order Manager PRO+</h1>
+<h1>📦 Order Manager PRO++</h1>
 
-<textarea id="input" placeholder="Paste data order..."></textarea>
-<button class="btn-main" onclick="tambah()">Tambah</button>
+<textarea id="input" placeholder="Contoh:
+Servis motor 28 Mei 14:00
+Ambil barang 30 Mei 09:30"></textarea>
+
+<button class="btn-main" onclick="tambah()">Tambah Order</button>
 
 <div id="clock"></div>
 
 <div class="container" id="output"></div>
 
 <script>
+
 let data = JSON.parse(localStorage.getItem("orders") || "[]")
 
-/* ID */
+/* =========================
+   GENERATE ID
+========================= */
 function genId(){
   return Date.now().toString(36)+Math.random().toString(36).slice(2)
 }
 
-/* NORMALIZE TEXT (ANTI DUPLIKAT) */
+/* =========================
+   NORMALIZE TEXT
+========================= */
 function normalizeText(text){
   return text
     .toLowerCase()
@@ -107,60 +243,135 @@ function normalizeText(text){
     .trim()
 }
 
-/* NORMALIZE DATE */
-function normalize(d){
-  if(!d) return null
-  let x=new Date(d)
-  x.setHours(0,0,0,0)
-  return x
-}
-
-/* PARSE TANGGAL */
+/* =========================
+   PARSE TANGGAL + JAM
+========================= */
 function parseTanggal(text){
+
   if(!text) return null
 
   const bulan={
-    januari:0,februari:1,maret:2,april:3,mei:4,juni:5,
-    juli:6,agustus:7,september:8,oktober:9,november:10,desember:11
+    januari:0,
+    februari:1,
+    maret:2,
+    april:3,
+    mei:4,
+    juni:5,
+    juli:6,
+    agustus:7,
+    september:8,
+    oktober:9,
+    november:10,
+    desember:11
   }
 
   text=text.toLowerCase()
 
-  let m=text.match(/(\d{1,2})\s*(januari|februari|maret|april|mei|juni|juli|agustus|september|oktober|november|desember)/)
-  if(m){
+  let match=text.match(
+    /(\d{1,2})\s*(januari|februari|maret|april|mei|juni|juli|agustus|september|oktober|november|desember)(?:.*?(\d{1,2})[:.](\d{2}))?/
+  )
+
+  if(match){
+
     let now=new Date()
-    let d=new Date(now.getFullYear(),bulan[m[2]],parseInt(m[1]))
-    if(d<now) d.setFullYear(now.getFullYear()+1)
-    return normalize(d)
-  }
 
-  const hariMap={minggu:0,senin:1,selasa:2,rabu:3,kamis:4,jumat:5,sabtu:6}
-  let now=new Date()
+    let hari=parseInt(match[1])
 
-  for(let h in hariMap){
-    if(text.includes(h)){
-      let diff=(hariMap[h]-now.getDay()+7)%7
-      if(diff===0) diff=7
-      return normalize(new Date(now.getTime()+diff*86400000))
+    let bulanIndex=bulan[match[2]]
+
+    let jam=match[3] ? parseInt(match[3]) : 0
+
+    let menit=match[4] ? parseInt(match[4]) : 0
+
+    let result=new Date(
+      now.getFullYear(),
+      bulanIndex,
+      hari,
+      jam,
+      menit
+    )
+
+    if(result < now){
+      result.setFullYear(now.getFullYear()+1)
     }
+
+    return result
   }
 
   return null
 }
 
-/* STATUS HARI */
+/* =========================
+   STATUS HARI
+========================= */
 function getDayStatus(date){
+
   if(!date) return ""
-  let today=normalize(new Date())
-  let diff=(date-today)/86400000
-  if(diff===0) return "today"
-  if(diff===1) return "tomorrow"
+
+  let now = new Date()
+
+  let today = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate()
+  )
+
+  let target = new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate()
+  )
+
+  let diff = Math.floor((target - today) / 86400000)
+
+  if(diff === 0) return "today"
+
+  if(diff === 1) return "tomorrow"
+
+  if(diff === 2) return "h2"
+
   return ""
 }
 
-/* SORT PRIORITAS */
+/* =========================
+   COUNTDOWN
+========================= */
+function getCountdown(date){
+
+  if(!date) return ""
+
+  let now=new Date()
+
+  let diff=date-now
+
+  if(diff<=0){
+    return "⏰ Waktu lewat"
+  }
+
+  let hari=Math.floor(diff/86400000)
+
+  let jam=Math.floor((diff%86400000)/3600000)
+
+  let menit=Math.floor((diff%3600000)/60000)
+
+  if(hari>0){
+    return `⏳ ${hari} hari ${jam} jam lagi`
+  }
+
+  if(jam>0){
+    return `⏳ ${jam} jam ${menit} menit lagi`
+  }
+
+  return `⏳ ${menit} menit lagi`
+}
+
+/* =========================
+   SORT PRIORITAS
+========================= */
 function sortPrioritas(){
+
   data=data.map((d,i)=>({...d,_i:i})).sort((a,b)=>{
+
     let da=parseTanggal(a.text)
     let db=parseTanggal(b.text)
 
@@ -168,142 +379,273 @@ function sortPrioritas(){
     let dayB=getDayStatus(db)
 
     const rank=(x,day)=>{
-      if(x.progress==="proses"&&day==="today") return 0
-      if(x.progress==="proses") return 1
-      if(x.progress==="belum") return 2
-      if(x.progress==="selesai") return 3
-      return 2
+
+      if(x.progress==="proses" && day==="today") return 0
+
+      if(x.progress==="proses" && day==="tomorrow") return 1
+
+      if(x.progress==="proses" && day==="h2") return 2
+
+      if(x.progress==="proses") return 3
+
+      if(x.progress==="belum" && day==="today") return 4
+
+      if(x.progress==="belum") return 5
+
+      if(x.progress==="selesai") return 6
+
+      return 7
     }
 
     let pa=rank(a,dayA)
     let pb=rank(b,dayB)
-    if(pa!==pb) return pa-pb
 
-    if(!da&&!db) return a._i-b._i
+    if(pa!==pb){
+      return pa-pb
+    }
+
+    if(!da&&!db){
+      return a._i-b._i
+    }
+
     if(!da) return -1
+
     if(!db) return 1
 
-    if(da-db!==0) return da-db
+    return da-db
 
-    return a._i-b._i
   }).map(({_i,...r})=>r)
 }
 
-/* TAMBAH + ANTI DUPLIKAT */
+/* =========================
+   TAMBAH
+========================= */
 function tambah(){
+
   let lines=document.getElementById("input").value.split("\n")
 
-  lines.forEach(x=>{
-    let clean=x.trim()
+  lines.forEach(line=>{
+
+    let clean=line.trim()
+
     if(!clean) return
 
     let newText=normalizeText(clean)
 
-    let sudahAda=data.some(d=>normalizeText(d.text)===newText)
+    let sudahAda=data.some(
+      d=>normalizeText(d.text)===newText
+    )
 
     if(!sudahAda){
+
       data.push({
         id:genId(),
         text:clean,
         progress:"belum"
       })
+
     }
+
   })
 
   sortPrioritas()
+
   simpan()
+
   render()
+
   document.getElementById("input").value=""
 }
 
-/* HAPUS */
+/* =========================
+   HAPUS
+========================= */
 function hapus(id){
+
   data=data.filter(x=>x.id!==id)
-  sortPrioritas()
+
   simpan()
+
   render()
 }
 
-/* EDIT */
+/* =========================
+   EDIT
+========================= */
 function edit(id){
+
   let item=data.find(x=>x.id===id)
+
   if(!item) return
 
-  let baru=prompt("Edit:",item.text)
-  if(baru&&baru.trim()){
+  let baru=prompt("Edit order:",item.text)
+
+  if(baru && baru.trim()){
+
     item.text=baru.trim()
+
     sortPrioritas()
+
     simpan()
+
     render()
   }
 }
 
-/* UPDATE PROGRESS */
+/* =========================
+   UPDATE STATUS
+========================= */
 function updateProgress(id,val){
+
   let item=data.find(x=>x.id===id)
+
   if(!item) return
 
   item.progress=val
+
   sortPrioritas()
+
   simpan()
+
   render()
 }
 
-/* RENDER */
+/* =========================
+   SIMPAN
+========================= */
+function simpan(){
+  localStorage.setItem("orders",JSON.stringify(data))
+}
+
+/* =========================
+   RENDER
+========================= */
 function render(){
+
   let html=""
 
   data.forEach(d=>{
+
     let date=parseTanggal(d.text)
+
     let day=getDayStatus(date)
-    let isSuper=(d.progress==="proses"&&day==="today")
+
+    let countdown=getCountdown(date)
+
+    let isSuper=(d.progress==="proses" && day==="today")
 
     html+=`
+
     <div class="card ${d.progress} ${day} ${isSuper?'super-priority':''}">
+
       <div class="left">
+
         <div class="title">
 
-          ${isSuper?'<span class="urgent-big">⚠️ URGENT</span>':''}
+          ${isSuper
+            ? '<span class="urgent-big">⚠️ SUPER URGENT</span>'
+            : ''
+          }
 
           ${
-            day==="today" ? '<span class="tag todayTag">🔴 HARI INI</span>' :
-            day==="tomorrow" ? '<span class="tag tomorrowTag">🟠 BESOK</span>' : ''
+            day==="today"
+            ? '<span class="tag todayTag">🔴 HARI INI</span>'
+
+            : day==="tomorrow"
+            ? '<span class="tag tomorrowTag">🟠 BESOK</span>'
+
+            : day==="h2"
+            ? '<span class="tag h2Tag">🔵 H-2</span>'
+
+            : ''
           }
 
           ${d.text}
 
-          <select class="progress p-${d.progress}" onchange="updateProgress('${d.id}',this.value)">
-            <option value="belum" ${d.progress==="belum"?"selected":""}>Belum</option>
-            <option value="proses" ${d.progress==="proses"?"selected":""}>Proses</option>
-            <option value="selesai" ${d.progress==="selesai"?"selected":""}>Selesai</option>
+          <select
+            class="progress p-${d.progress}"
+            onchange="updateProgress('${d.id}',this.value)"
+          >
+            <option value="belum" ${d.progress==="belum"?"selected":""}>
+              Belum
+            </option>
+
+            <option value="proses" ${d.progress==="proses"?"selected":""}>
+              Proses
+            </option>
+
+            <option value="selesai" ${d.progress==="selesai"?"selected":""}>
+              Selesai
+            </option>
           </select>
+
         </div>
 
         <div class="date">
-          ${date?date.toLocaleDateString("id-ID",{weekday:'long',day:'numeric',month:'long'}):"Tidak ada tanggal"}
+
+          ${
+            date
+            ? date.toLocaleString("id-ID",{
+                weekday:'long',
+                day:'numeric',
+                month:'long',
+                hour:'2-digit',
+                minute:'2-digit'
+              })
+            : "Tidak ada tanggal"
+          }
+
         </div>
+
+        ${
+          date
+          ? `<div class="countdown">${countdown}</div>`
+          : ''
+        }
+
       </div>
 
       <div class="actions">
-        <button class="edit" onclick="edit('${d.id}')">✏️</button>
-        <button class="delete" onclick="hapus('${d.id}')">🗑️</button>
+
+        <button class="edit" onclick="edit('${d.id}')">
+          ✏️
+        </button>
+
+        <button class="delete" onclick="hapus('${d.id}')">
+          🗑️
+        </button>
+
       </div>
-    </div>`
+
+    </div>
+    `
   })
 
   document.getElementById("output").innerHTML=html
 }
 
-/* CLOCK */
+/* =========================
+   CLOCK
+========================= */
 setInterval(()=>{
-  document.getElementById("clock").innerText=new Date().toLocaleString("id-ID")
+
+  document.getElementById("clock").innerText=
+    new Date().toLocaleString("id-ID")
+
 },1000)
 
-function simpan(){
-  localStorage.setItem("orders",JSON.stringify(data))
-}
+/* =========================
+   AUTO REFRESH COUNTDOWN
+========================= */
+setInterval(()=>{
+  render()
+},60000)
 
+/* =========================
+   INIT
+========================= */
 render()
+
 </script>
 
 </body>
