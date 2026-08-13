@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Order Manager PRO+ Akurat</title>
+<title>Order Manager PRO+ Ultimate</title>
 
 <style>
 body{
@@ -165,12 +165,206 @@ button{
 
 .edit{background:#3b82f6;color:#fff}
 .delete{background:#ef4444;color:#fff}
+
+
+/* ===== PRO+ ULTIMATE ADDITIONS ===== */
+body.light{
+  background:#f1f5f9;
+  color:#0f172a
+}
+body.light textarea{
+  background:#fff;
+  color:#0f172a;
+  border:1px solid #cbd5e1
+}
+body.light .card{
+  background:#fff;
+  color:#0f172a;
+  box-shadow:0 4px 14px rgba(15,23,42,.10)
+}
+body.light .card.proses{background:#fffbeb}
+body.light .card.selesai{background:#ecfdf5}
+body.light .note{background:#f8fafc;color:#475569}
+body.light .tool-btn,
+body.light .move-actions button{
+  background:#fff;
+  color:#0f172a;
+  border-color:#cbd5e1
+}
+body.light .dash-card{
+  background:#fff;
+  border-color:#cbd5e1;
+  box-shadow:0 4px 14px rgba(15,23,42,.08)
+}
+
+.topbar{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin:0 auto 12px;
+  max-width:980px
+}
+
+.tool-btn{
+  background:#1e293b;
+  color:#fff;
+  border:1px solid #334155;
+  padding:8px 12px;
+  border-radius:9px
+}
+
+.dashboard{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+  margin-top:18px
+}
+
+.dash-card{
+  background:#1e293b;
+  border:1px solid #334155;
+  border-radius:12px;
+  padding:12px;
+  text-align:center
+}
+
+.dash-number{
+  display:block;
+  font-size:24px;
+  font-weight:800;
+  margin-bottom:3px
+}
+
+.dash-label{
+  font-size:12px;
+  color:#94a3b8
+}
+
+.drag-handle{
+  cursor:grab;
+  user-select:none;
+  font-size:20px;
+  color:#94a3b8;
+  padding:8px 4px;
+  flex-shrink:0
+}
+
+.drag-handle:active{cursor:grabbing}
+.card.dragging{opacity:.45;transform:scale(.99)}
+.card.drag-over{border-top:4px solid #38bdf8!important}
+
+.note{
+  margin-top:7px;
+  padding:7px 9px;
+  border-radius:8px;
+  background:#111827;
+  color:#cbd5e1;
+  font-size:12px;
+  line-height:1.45;
+  white-space:pre-wrap
+}
+
+.category-wrap{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  margin-top:5px
+}
+
+.category-select{
+  font-size:11px;
+  padding:4px 7px;
+  border-radius:6px;
+  border:none;
+  color:#fff;
+  max-width:135px
+}
+
+.category-color{
+  width:29px;
+  height:24px;
+  padding:0;
+  border:none;
+  border-radius:6px;
+  background:transparent;
+  cursor:pointer
+}
+
+.note-btn{background:#8b5cf6;color:#fff}
+
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:24px;
+  transform:translateX(-50%) translateY(120px);
+  min-width:min(92vw,420px);
+  background:#111827;
+  color:#fff;
+  padding:11px 12px;
+  border-radius:11px;
+  box-shadow:0 10px 35px rgba(0,0,0,.35);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  opacity:0;
+  pointer-events:none;
+  transition:.25s;
+  z-index:9999
+}
+
+.toast.show{
+  transform:translateX(-50%) translateY(0);
+  opacity:1;
+  pointer-events:auto
+}
+
+.toast button{
+  background:#22c55e;
+  color:#fff;
+  padding:7px 10px;
+  font-weight:bold
+}
+
+.move-actions{
+  display:none;
+  gap:4px;
+  margin-top:7px
+}
+
+.move-actions button{
+  background:#111827;
+  color:#fff;
+  border:1px solid #334155;
+  padding:4px 8px;
+  font-size:11px
+}
+
+.empty{
+  text-align:center;
+  padding:30px 15px;
+  color:#94a3b8
+}
+
+@media(max-width:700px){
+  body{padding:12px}
+  .dashboard{grid-template-columns:repeat(2,1fr)}
+  .card{align-items:flex-start}
+  .drag-handle{display:none}
+  .move-actions{display:flex}
+  .actions{flex-wrap:wrap;max-width:80px}
+}
+
 </style>
 </head>
 
 <body>
 
 <h1>📦 Order Manager PRO+</h1>
+
+<div class="topbar">
+  <button class="tool-btn" id="themeBtn" onclick="toggleTheme()">☀️ Light Mode</button>
+</div>
 
 <textarea id="input" placeholder="Contoh:
 Servis motor senin 14:00
@@ -186,16 +380,46 @@ Follow up lusa"></textarea>
 <div class="hint">
   Didukung: hari ini, besok, lusa, Senin–Minggu, 28 Mei, 28 Mei 2027,
   28/05/2027, 28-05-2027, jam/pukul/pkl 9, 14:30, 14.30, 7 pagi/siang/sore/malam.
-  Jika tidak ada jam, deadline dianggap sampai akhir hari.
+  Jika tidak ada jam, deadline dianggap sampai akhir hari.<br>
+  📌 Klik 📝 untuk catatan. Drag ☰ untuk urutan manual; di HP gunakan ↑ ↓.
+  Warna kategori dapat diubah dari kotak warna pada setiap task.
 </div>
 
 <div id="clock"></div>
+
+<div class="dashboard">
+  <div class="dash-card"><span class="dash-number" id="dashOverdue">0</span><span class="dash-label">⛔ Lewat</span></div>
+  <div class="dash-card"><span class="dash-number" id="dashToday">0</span><span class="dash-label">🔴 Hari Ini</span></div>
+  <div class="dash-card"><span class="dash-number" id="dashTomorrow">0</span><span class="dash-label">🟠 Besok</span></div>
+  <div class="dash-card"><span class="dash-number" id="dashWeek">0</span><span class="dash-label">📅 Minggu Ini</span></div>
+</div>
+
 <div class="container" id="output"></div>
+
+<div class="toast" id="undoToast">
+  <span id="undoText">Task dihapus</span>
+  <button onclick="undoDelete()">↩ Undo</button>
+</div>
 
 <script>
 const STORAGE_KEY = "orders";
+const SETTINGS_KEY = "orderManagerSettings";
 
+const CATEGORY_PRESETS = {
+  "Umum":"#64748b",
+  "Kerja":"#3b82f6",
+  "Pribadi":"#8b5cf6",
+  "Servis":"#f97316",
+  "Meeting":"#06b6d4",
+  "Pengiriman":"#eab308",
+  "Penting":"#ef4444"
+};
+
+let settings = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{"theme":"dark"}');
 let data = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+let deletedSnapshot = null;
+let undoTimer = null;
+let draggedId = null;
 
 /* =========================================================
    UTILITAS
@@ -617,29 +841,47 @@ function applyParsedDeadline(item, referenceDate = new Date()){
   return item;
 }
 
-/* Migrasi data lama yang belum punya dueAt.
-   Hanya dilakukan sekali saat halaman versi baru pertama kali dibuka. */
+/* Migrasi data lama: deadline + fitur baru tetap kompatibel. */
 let migrated = false;
 
 data = data.map(item => {
-  if(!("dueAt" in item)){
-    migrated = true;
-    return applyParsedDeadline({
-      ...item,
-      id: item.id || genId(),
-      progress: item.progress || "belum"
-    });
-  }
-
-  return {
+  const next = {
     ...item,
     id: item.id || genId(),
-    progress: item.progress || "belum"
+    progress: item.progress || "belum",
+    note: item.note || "",
+    category: item.category || "Umum",
+    categoryColor: item.categoryColor || CATEGORY_PRESETS[item.category || "Umum"] || CATEGORY_PRESETS.Umum
   };
+
+  if(!("dueAt" in next)){
+    migrated = true;
+    applyParsedDeadline(next);
+  }
+
+  if(!("note" in item) || !("category" in item) || !("categoryColor" in item)){
+    migrated = true;
+  }
+
+  return next;
 });
 
 if(migrated){
   simpan();
+}
+
+/* THEME */
+function applyTheme(){
+  const light = settings.theme === "light";
+  document.body.classList.toggle("light", light);
+  const btn = document.getElementById("themeBtn");
+  if(btn) btn.innerText = light ? "🌙 Dark Mode" : "☀️ Light Mode";
+}
+
+function toggleTheme(){
+  settings.theme = settings.theme === "light" ? "dark" : "light";
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  applyTheme();
 }
 
 /* =========================================================
@@ -718,6 +960,41 @@ function getCountdown(date, hasTime){
   return `⏳ ${Math.max(0, menit)} menit lagi`;
 }
 
+
+/* SMART DASHBOARD */
+function getEndOfThisWeek(now){
+  // Minggu kalender: Senin sampai Minggu.
+  const day = now.getDay();
+  const untilSunday = day === 0 ? 0 : 7 - day;
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate() + untilSunday, 23, 59, 59, 999);
+}
+
+function updateDashboard(){
+  const now = new Date();
+  const endWeek = getEndOfThisWeek(now);
+  let overdue = 0;
+  let today = 0;
+  let tomorrow = 0;
+  let week = 0;
+
+  data.forEach(item => {
+    if(item.progress === "selesai") return;
+    const date = getStoredDate(item);
+    if(!date) return;
+
+    const days = diffCalendarDays(date, now);
+    if(date < now) overdue++;
+    if(days === 0) today++;
+    if(days === 1) tomorrow++;
+    if(date >= now && date <= endWeek) week++;
+  });
+
+  document.getElementById("dashOverdue").innerText = overdue;
+  document.getElementById("dashToday").innerText = today;
+  document.getElementById("dashTomorrow").innerText = tomorrow;
+  document.getElementById("dashWeek").innerText = week;
+}
+
 /* =========================================================
    SORT PRIORITAS
 ========================================================= */
@@ -767,82 +1044,182 @@ function sortPrioritas(){
 }
 
 /* =========================================================
-   CRUD
+   CRUD + CATATAN + UNDO + KATEGORI + MANUAL ORDER
 ========================================================= */
 
 function tambah(){
   const input = document.getElementById("input");
-
   const lines = input.value.split("\n");
 
   lines.forEach(line => {
     const clean = line.trim();
-
     if(!clean) return;
 
     const newText = normalizeText(clean);
-
-    const sudahAda = data.some(
-      d => normalizeText(d.text) === newText
-    );
+    const sudahAda = data.some(d => normalizeText(d.text) === newText);
 
     if(!sudahAda){
       const item = {
         id: genId(),
         text: clean,
         progress: "belum",
+        note: "",
+        category: "Umum",
+        categoryColor: CATEGORY_PRESETS.Umum,
         dueAt: null,
         hasTime: false,
         dateType: null
       };
 
       applyParsedDeadline(item);
-      data.push(item);
+      // Task baru di atas, setelah itu urutan sepenuhnya manual.
+      data.unshift(item);
     }
   });
 
-  sortPrioritas();
   simpan();
   render();
-
   input.value = "";
 }
 
 function hapus(id){
-  data = data.filter(x => x.id !== id);
+  const index = data.findIndex(x => x.id === id);
+  if(index === -1) return;
 
-  sortPrioritas();
+  deletedSnapshot = { item: {...data[index]}, index };
+  const deletedText = data[index].text;
+  data.splice(index, 1);
+
+  simpan();
+  render();
+  showUndoToast(deletedText);
+}
+
+function showUndoToast(text){
+  clearTimeout(undoTimer);
+  document.getElementById("undoText").innerText = `🗑️ "${text}" dihapus`;
+  document.getElementById("undoToast").classList.add("show");
+
+  undoTimer = setTimeout(() => {
+    document.getElementById("undoToast").classList.remove("show");
+    deletedSnapshot = null;
+  }, 7000);
+}
+
+function undoDelete(){
+  if(!deletedSnapshot) return;
+
+  const index = Math.min(deletedSnapshot.index, data.length);
+  data.splice(index, 0, deletedSnapshot.item);
+  deletedSnapshot = null;
+  clearTimeout(undoTimer);
+  document.getElementById("undoToast").classList.remove("show");
+
   simpan();
   render();
 }
 
 function edit(id){
   const item = data.find(x => x.id === id);
-
   if(!item) return;
 
-  const baru = prompt("Edit:", item.text);
-
+  const baru = prompt("Edit judul task:", item.text);
   if(baru && baru.trim()){
     item.text = baru.trim();
-
-    // Parse ulang hanya ketika teks diubah.
     applyParsedDeadline(item);
-
-    sortPrioritas();
     simpan();
     render();
   }
 }
 
-function updateProgress(id, val){
+function editNote(id){
   const item = data.find(x => x.id === id);
-
   if(!item) return;
 
-  item.progress = val;
+  const baru = prompt(
+    "Catatan tambahan:\n(Kosongkan untuk menghapus catatan)",
+    item.note || ""
+  );
 
-  sortPrioritas();
+  if(baru === null) return;
+  item.note = baru.trim();
+  simpan();
+  render();
+}
+
+function updateProgress(id, val){
+  const item = data.find(x => x.id === id);
+  if(!item) return;
+  item.progress = val;
+  simpan();
+  render();
+}
+
+function updateCategory(id, category){
+  const item = data.find(x => x.id === id);
+  if(!item) return;
+  item.category = category;
+  item.categoryColor = CATEGORY_PRESETS[category] || item.categoryColor || CATEGORY_PRESETS.Umum;
+  simpan();
+  render();
+}
+
+function updateCategoryColor(id, color){
+  const item = data.find(x => x.id === id);
+  if(!item) return;
+  item.categoryColor = color;
+  simpan();
+  render();
+}
+
+/* DRAG & DROP DESKTOP */
+function dragStart(event, id){
+  draggedId = id;
+  event.dataTransfer.effectAllowed = "move";
+  event.dataTransfer.setData("text/plain", id);
+  const card = event.target.closest(".card");
+  if(card) setTimeout(() => card.classList.add("dragging"), 0);
+}
+
+function dragOver(event){
+  event.preventDefault();
+  const card = event.currentTarget;
+  if(card.dataset.id === draggedId) return;
+  document.querySelectorAll(".card.drag-over").forEach(x => x.classList.remove("drag-over"));
+  card.classList.add("drag-over");
+}
+
+function dropCard(event, targetId){
+  event.preventDefault();
+  document.querySelectorAll(".card.drag-over").forEach(x => x.classList.remove("drag-over"));
+  if(!draggedId || draggedId === targetId) return;
+
+  const fromIndex = data.findIndex(x => x.id === draggedId);
+  const toIndex = data.findIndex(x => x.id === targetId);
+  if(fromIndex === -1 || toIndex === -1) return;
+
+  const [moved] = data.splice(fromIndex, 1);
+  const adjusted = fromIndex < toIndex ? toIndex - 1 : toIndex;
+  data.splice(adjusted, 0, moved);
+
+  simpan();
+  render();
+}
+
+function dragEnd(){
+  draggedId = null;
+  document.querySelectorAll(".dragging,.drag-over").forEach(x => {
+    x.classList.remove("dragging", "drag-over");
+  });
+}
+
+function moveItem(id, direction){
+  const index = data.findIndex(x => x.id === id);
+  if(index === -1) return;
+  const target = index + direction;
+  if(target < 0 || target >= data.length) return;
+
+  [data[index], data[target]] = [data[target], data[index]];
   simpan();
   render();
 }
@@ -867,6 +1244,10 @@ function escapeHtml(value){
 function render(){
   let html = "";
 
+  if(data.length === 0){
+    html = '<div class="empty">Belum ada task.<br>Tambahkan order atau jadwal di atas.</div>';
+  }
+
   data.forEach(d => {
     const date = getStoredDate(d);
     const day = getDayStatus(date);
@@ -874,18 +1255,13 @@ function render(){
     const countdown = getCountdown(date, d.hasTime);
 
     let isSuper = false;
-
     if(date && d.hasTime && d.progress !== "selesai"){
       const diff = date - new Date();
       const hours = diff / 3600000;
-
-      if(diff > 0 && hours <= 1){
-        isSuper = true;
-      }
+      if(diff > 0 && hours <= 1) isSuper = true;
     }
 
     let dateText = "Tidak ada tanggal";
-
     if(date){
       const options = {
         weekday:"long",
@@ -900,72 +1276,88 @@ function render(){
       }
 
       dateText = date.toLocaleString("id-ID", options);
-
-      if(!d.hasTime){
-        dateText += " • tanpa jam";
-      }
+      if(!d.hasTime) dateText += " • tanpa jam";
     }
 
+    const categoryOptions = Object.keys(CATEGORY_PRESETS).map(cat => `
+      <option value="${escapeHtml(cat)}" ${d.category === cat ? "selected" : ""}>${escapeHtml(cat)}</option>
+    `).join("");
+
     html += `
-    <div class="card ${d.progress} ${day} ${isSuper ? "super-priority" : ""}">
+    <div
+      class="card ${d.progress} ${day} ${isSuper ? "super-priority" : ""}"
+      data-id="${escapeHtml(d.id)}"
+      ondragover="dragOver(event)"
+      ondrop="dropCard(event,'${escapeHtml(d.id)}')"
+    >
+      <div
+        class="drag-handle"
+        draggable="true"
+        ondragstart="dragStart(event,'${escapeHtml(d.id)}')"
+        ondragend="dragEnd()"
+        title="Drag untuk mengubah urutan"
+      >☰</div>
+
       <div class="left">
         <div class="title">
-
-          ${
-            isSuper
-              ? '<span class="urgent-big">⚠️ SUPER PRIORITAS</span>'
-              : ""
-          }
-
-          ${
-            day === "today"
-              ? '<span class="tag todayTag">🔴 HARI INI</span>'
-              : day === "tomorrow"
-                ? '<span class="tag tomorrowTag">🟠 BESOK</span>'
-                : day === "h2"
-                  ? '<span class="tag h2Tag">🔵 H-2</span>'
-                  : ""
-          }
-
+          ${isSuper ? '<span class="urgent-big">⚠️ SUPER PRIORITAS</span>' : ''}
+          ${day === "today"
+            ? '<span class="tag todayTag">🔴 HARI INI</span>'
+            : day === "tomorrow"
+              ? '<span class="tag tomorrowTag">🟠 BESOK</span>'
+              : day === "h2"
+                ? '<span class="tag h2Tag">🔵 H-2</span>'
+                : ''}
           ${realtime}
-
+          <span class="tag" style="background:${escapeHtml(d.categoryColor)}">${escapeHtml(d.category)}</span>
           ${escapeHtml(d.text)}
 
           <select
-            class="progress p-${d.progress}"
-            onchange="updateProgress('${d.id}', this.value)"
+            class="progress p-${escapeHtml(d.progress)}"
+            onchange="updateProgress('${escapeHtml(d.id)}',this.value)"
           >
-            <option value="belum" ${d.progress === "belum" ? "selected" : ""}>
-              Belum
-            </option>
-
-            <option value="proses" ${d.progress === "proses" ? "selected" : ""}>
-              Proses
-            </option>
-
-            <option value="selesai" ${d.progress === "selesai" ? "selected" : ""}>
-              Selesai
-            </option>
+            <option value="belum" ${d.progress === "belum" ? "selected" : ""}>Belum</option>
+            <option value="proses" ${d.progress === "proses" ? "selected" : ""}>Proses</option>
+            <option value="selesai" ${d.progress === "selesai" ? "selected" : ""}>Selesai</option>
           </select>
         </div>
 
-        <div class="date">${escapeHtml(dateText)}</div>
+        <div class="category-wrap">
+          <select
+            class="category-select"
+            style="background:${escapeHtml(d.categoryColor)}"
+            onchange="updateCategory('${escapeHtml(d.id)}',this.value)"
+          >${categoryOptions}</select>
 
-        ${
-          date
-            ? `<div class="countdown">${escapeHtml(countdown)}</div>`
-            : ""
-        }
+          <input
+            class="category-color"
+            type="color"
+            value="${escapeHtml(d.categoryColor)}"
+            title="Pilih warna kategori"
+            onchange="updateCategoryColor('${escapeHtml(d.id)}',this.value)"
+          >
+        </div>
+
+        <div class="date">${escapeHtml(dateText)}</div>
+        ${date ? `<div class="countdown">${escapeHtml(countdown)}</div>` : ''}
+        ${d.note ? `<div class="note">📝 ${escapeHtml(d.note)}</div>` : ''}
+
+        <div class="move-actions">
+          <button onclick="moveItem('${escapeHtml(d.id)}',-1)">↑ Naik</button>
+          <button onclick="moveItem('${escapeHtml(d.id)}',1)">↓ Turun</button>
+        </div>
       </div>
 
       <div class="actions">
-        <button class="edit" onclick="edit('${d.id}')">✏️</button>
-        <button class="delete" onclick="hapus('${d.id}')">🗑️</button>
+        <button class="note-btn" onclick="editNote('${escapeHtml(d.id)}')" title="Catatan">📝</button>
+        <button class="edit" onclick="edit('${escapeHtml(d.id)}')" title="Edit judul">✏️</button>
+        <button class="delete" onclick="hapus('${escapeHtml(d.id)}')" title="Hapus">🗑️</button>
       </div>
     </div>`;
   });
 
   document.getElementById("output").innerHTML = html;
+  updateDashboard();
 }
 
 /* =========================================================
@@ -990,7 +1382,6 @@ updateClock();
 setInterval(updateClock, 1000);
 
 setInterval(() => {
-  sortPrioritas();
   render();
 }, 60000);
 
@@ -998,7 +1389,7 @@ function simpan(){
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
 
-sortPrioritas();
+applyTheme();
 render();
 </script>
 
