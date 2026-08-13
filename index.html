@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Order Manager PRO+</title>
+<title>Order Manager PRO+ Akurat</title>
 
 <style>
 body{
@@ -14,20 +14,19 @@ body{
   padding:20px
 }
 
-h1{
-  text-align:center
-}
+h1{text-align:center}
 
 textarea{
   width:100%;
-  height:140px;
+  box-sizing:border-box;
+  height:160px;
   border-radius:10px;
   border:none;
   padding:10px;
   margin-bottom:10px;
   background:#1e293b;
   color:#fff;
-  resize:none
+  resize:vertical
 }
 
 button{
@@ -51,9 +50,14 @@ button{
   color:#94a3b8
 }
 
-.container{
-  margin-top:20px
+.hint{
+  margin-top:8px;
+  font-size:12px;
+  line-height:1.5;
+  color:#94a3b8
 }
+
+.container{margin-top:20px}
 
 .card{
   background:#1e293b;
@@ -63,33 +67,17 @@ button{
   display:flex;
   justify-content:space-between;
   align-items:center;
+  gap:10px;
   transition:.3s
 }
 
-.card.proses{
-  background:#78350f
-}
+.card.proses{background:#78350f}
+.card.selesai{background:#064e3b}
 
-.card.selesai{
-  background:#064e3b
-}
+.card.today{border:2px solid #ef4444}
+.card.tomorrow{border:2px solid #f59e0b}
+.card.h2{border:2px solid #3b82f6}
 
-/* TODAY */
-.card.today{
-  border:2px solid #ef4444
-}
-
-/* TOMORROW */
-.card.tomorrow{
-  border:2px solid #f59e0b
-}
-
-/* H-2 */
-.card.h2{
-  border:2px solid #3b82f6
-}
-
-/* BLINK */
 @keyframes blinkRed{
   0%{box-shadow:0 0 5px #ef4444}
   50%{box-shadow:0 0 20px #ef4444}
@@ -101,7 +89,6 @@ button{
   border:2px solid #ef4444!important
 }
 
-/* URGENT TEXT */
 .urgent-big{
   display:block;
   font-size:12px;
@@ -117,13 +104,12 @@ button{
   100%{opacity:1}
 }
 
-.left{
-  flex:1
-}
+.left{flex:1; min-width:0}
 
 .title{
   font-size:14px;
-  line-height:1.7
+  line-height:1.7;
+  overflow-wrap:anywhere
 }
 
 .progress{
@@ -135,17 +121,9 @@ button{
   color:#fff
 }
 
-.p-belum{
-  background:#64748b
-}
-
-.p-proses{
-  background:#f59e0b
-}
-
-.p-selesai{
-  background:#22c55e
-}
+.p-belum{background:#64748b}
+.p-proses{background:#f59e0b}
+.p-selesai{background:#22c55e}
 
 .tag{
   font-size:11px;
@@ -157,17 +135,10 @@ button{
   margin-bottom:4px
 }
 
-.todayTag{
-  background:#ef4444
-}
-
-.tomorrowTag{
-  background:#f59e0b
-}
-
-.h2Tag{
-  background:#3b82f6
-}
+.todayTag{background:#ef4444}
+.tomorrowTag{background:#f59e0b}
+.h2Tag{background:#3b82f6}
+.infoTag{background:#475569}
 
 .date{
   font-size:11px;
@@ -183,7 +154,8 @@ button{
 
 .actions{
   display:flex;
-  gap:5px
+  gap:5px;
+  flex-shrink:0
 }
 
 .actions button{
@@ -191,15 +163,8 @@ button{
   font-size:11px
 }
 
-.edit{
-  background:#3b82f6;
-  color:#fff
-}
-
-.delete{
-  background:#ef4444;
-  color:#fff
-}
+.edit{background:#3b82f6;color:#fff}
+.delete{background:#ef4444;color:#fff}
 </style>
 </head>
 
@@ -209,74 +174,216 @@ button{
 
 <textarea id="input" placeholder="Contoh:
 Servis motor senin 14:00
-Meeting jumat 09:00
+Meeting jumat pukul 09.00
 Ambil barang rabu
-Deadline 28 mei 13:00"></textarea>
+Deadline 28 Mei 13:00
+Kirim laporan 28/05/2027 jam 16
+Belanja besok 7 malam
+Follow up lusa"></textarea>
 
-<button class="btn-main" onclick="tambah()">
-Tambah
-</button>
+<button class="btn-main" onclick="tambah()">Tambah</button>
+
+<div class="hint">
+  Didukung: hari ini, besok, lusa, Senin–Minggu, 28 Mei, 28 Mei 2027,
+  28/05/2027, 28-05-2027, jam/pukul/pkl 9, 14:30, 14.30, 7 pagi/siang/sore/malam.
+  Jika tidak ada jam, deadline dianggap sampai akhir hari.
+</div>
 
 <div id="clock"></div>
-
 <div class="container" id="output"></div>
 
 <script>
+const STORAGE_KEY = "orders";
 
-let data = JSON.parse(
-  localStorage.getItem("orders") || "[]"
-)
+let data = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
 
-/* ID */
+/* =========================================================
+   UTILITAS
+========================================================= */
+
 function genId(){
-  return Date.now().toString(36)
-  + Math.random().toString(36).slice(2)
+  return Date.now().toString(36) + Math.random().toString(36).slice(2);
 }
 
-/* NORMALIZE TEXT */
 function normalizeText(text){
-  return text
+  return String(text || "")
     .toLowerCase()
-    .replace(/[^\w\s]/g,'')
-    .replace(/\s+/g,' ')
-    .trim()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^\p{L}\p{N}\s]/gu, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
-/* NORMALIZE DATE */
-function normalize(d){
-
-  if(!d) return null
-
-  let x=new Date(d)
-
-  x.setHours(0,0,0,0)
-
-  return x
+function startOfDay(d){
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0, 0);
 }
 
-/* PARSE TANGGAL + HARI + JAM */
-function parseTanggal(text){
+function endOfDay(d){
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59, 999);
+}
 
-  if(!text) return null
+function validDateParts(year, month, day){
+  const d = new Date(year, month, day);
+  return (
+    d.getFullYear() === year &&
+    d.getMonth() === month &&
+    d.getDate() === day
+  );
+}
 
-  text=text.toLowerCase()
+function localDayNumber(d){
+  return Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000;
+}
 
-  const bulan={
-    januari:0,
-    februari:1,
-    maret:2,
-    april:3,
-    mei:4,
-    juni:5,
-    juli:6,
-    agustus:7,
-    september:8,
-    oktober:9,
-    november:10,
-    desember:11
+function diffCalendarDays(a, b){
+  return Math.round(localDayNumber(a) - localDayNumber(b));
+}
+
+/* =========================================================
+   PARSER WAKTU
+   Return:
+   {
+     hour,
+     minute,
+     hasTime,
+     matchedText
+   }
+========================================================= */
+
+function parseWaktu(rawText){
+  const text = rawText
+    .toLowerCase()
+    .replace(/jum['’]at/g, "jumat");
+
+  let hour = null;
+  let minute = 0;
+  let partOfDay = null;
+  let matchedText = "";
+
+  // 1. jam/pukul/pkl 14:30, jam 14.30, pukul 9, pkl 7 malam
+  let m = text.match(
+    /\b(?:jam|pukul|pkl)\s*(\d{1,2})(?:\s*[:.]\s*(\d{1,2}))?\s*(pagi|siang|sore|malam)?\b/i
+  );
+
+  if(m){
+    hour = Number(m[1]);
+    minute = m[2] == null ? 0 : Number(m[2]);
+    partOfDay = m[3] || null;
+    matchedText = m[0];
   }
 
-  const hariMap={
+  // 2. 14:30 / 14.30
+  if(hour == null){
+    const candidates = [...text.matchAll(/\b(\d{1,2})\s*[:.]\s*(\d{2})\b/g)];
+
+    for(const c of candidates){
+      const h = Number(c[1]);
+      const min = Number(c[2]);
+
+      // Hindari salah membaca bagian tanggal seperti 28.05 sebagai jam
+      if(h >= 0 && h <= 23 && min >= 0 && min <= 59){
+        hour = h;
+        minute = min;
+        matchedText = c[0];
+        break;
+      }
+    }
+  }
+
+  // 3. 7 pagi / 12 siang / 4 sore / 8 malam
+  if(hour == null){
+    m = text.match(/\b(\d{1,2})\s*(pagi|siang|sore|malam)\b/i);
+
+    if(m){
+      hour = Number(m[1]);
+      minute = 0;
+      partOfDay = m[2];
+      matchedText = m[0];
+    }
+  }
+
+  if(hour == null){
+    return {
+      hour: 23,
+      minute: 59,
+      hasTime: false,
+      matchedText: ""
+    };
+  }
+
+  // Validasi dasar
+  if(hour < 0 || hour > 23 || minute < 0 || minute > 59){
+    return {
+      hour: 23,
+      minute: 59,
+      hasTime: false,
+      matchedText: ""
+    };
+  }
+
+  // Konversi keterangan waktu Indonesia
+  if(partOfDay){
+    if(partOfDay === "pagi"){
+      if(hour === 12) hour = 0;
+    }
+    else if(partOfDay === "siang"){
+      if(hour >= 1 && hour <= 11) hour += 12;
+    }
+    else if(partOfDay === "sore"){
+      if(hour >= 1 && hour <= 11) hour += 12;
+    }
+    else if(partOfDay === "malam"){
+      if(hour >= 1 && hour <= 11) hour += 12;
+      else if(hour === 12) hour = 0;
+    }
+  }
+
+  return {
+    hour,
+    minute,
+    hasTime: true,
+    matchedText
+  };
+}
+
+/* =========================================================
+   PARSER TANGGAL / HARI / WAKTU INDONESIA
+
+   Catatan penting:
+   - Dipanggil saat TAMBAH / EDIT, bukan setiap render.
+   - Ini membuat deadline tidak "geser" sendiri ke minggu/tahun depan.
+========================================================= */
+
+function parseTanggal(text, referenceDate = new Date()){
+  if(!text || !String(text).trim()) return null;
+
+  const original = String(text).trim();
+
+  const clean = original
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/jum['’]at/g, "jumat")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  const bulan = {
+    januari:0, jan:0,
+    februari:1, feb:1,
+    maret:2, mar:2,
+    april:3, apr:3,
+    mei:4,
+    juni:5, jun:5,
+    juli:6, jul:6,
+    agustus:7, agu:7, agt:7,
+    september:8, sep:8, sept:8,
+    oktober:9, okt:9,
+    november:10, nov:10,
+    desember:11, des:11
+  };
+
+  const hariMap = {
     minggu:0,
     senin:1,
     selasa:2,
@@ -284,482 +391,615 @@ function parseTanggal(text){
     kamis:4,
     jumat:5,
     sabtu:6
+  };
+
+  const waktu = parseWaktu(clean);
+  const now = new Date(referenceDate);
+
+  function makeResult(year, month, day, type){
+    if(!validDateParts(year, month, day)) return null;
+
+    const date = new Date(
+      year,
+      month,
+      day,
+      waktu.hour,
+      waktu.minute,
+      waktu.hasTime ? 0 : 59,
+      waktu.hasTime ? 0 : 999
+    );
+
+    return {
+      date,
+      hasTime: waktu.hasTime,
+      type
+    };
   }
 
-  let now=new Date()
-
-  /* DETEKSI JAM */
-
-  let jamMatch=text.match(/(\d{1,2})[:.](\d{2})/)
-
-  let jam=0
-  let menit=0
-
-  if(jamMatch){
-    jam=parseInt(jamMatch[1])
-    menit=parseInt(jamMatch[2])
-  }
-
-  /* DETEKSI TANGGAL */
-
-  let tanggalMatch=text.match(
-    /(\d{1,2})\s*(januari|februari|maret|april|mei|juni|juli|agustus|september|oktober|november|desember)/
-  )
-
-  if(tanggalMatch){
-
-    let result=new Date(
+  /* 1. RELATIF: hari ini / besok / lusa */
+  if(/\bhari\s+ini\b/.test(clean)){
+    return makeResult(
       now.getFullYear(),
-      bulan[tanggalMatch[2]],
-      parseInt(tanggalMatch[1]),
-      jam,
-      menit
-    )
+      now.getMonth(),
+      now.getDate(),
+      "hari-ini"
+    );
+  }
 
-    if(result<now){
-      result.setFullYear(now.getFullYear()+1)
+  if(/\bbesok\b/.test(clean)){
+    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+    return makeResult(d.getFullYear(), d.getMonth(), d.getDate(), "besok");
+  }
+
+  if(/\blusa\b/.test(clean)){
+    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 2);
+    return makeResult(d.getFullYear(), d.getMonth(), d.getDate(), "lusa");
+  }
+
+  // "3 hari lagi"
+  let m = clean.match(/\b(\d{1,3})\s*hari\s+lagi\b/);
+  if(m){
+    const n = Number(m[1]);
+    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + n);
+    return makeResult(d.getFullYear(), d.getMonth(), d.getDate(), "hari-lagi");
+  }
+
+  /* 2. TANGGAL ANGKA: 28/05/2027, 28-05-2027, 28.05.2027
+        Tahun boleh 2 atau 4 digit.
+  */
+  m = clean.match(
+    /\b(?:tgl|tanggal)?\s*(\d{1,2})\s*([\/.-])\s*(\d{1,2})(?:\s*\2\s*(\d{2}|\d{4}))?\b/
+  );
+
+  if(m){
+    const day = Number(m[1]);
+    const month = Number(m[3]) - 1;
+
+    let year;
+
+    if(m[4]){
+      year = Number(m[4]);
+      if(year < 100) year += 2000;
+    }else{
+      year = now.getFullYear();
     }
 
-    return result
+    let result = makeResult(year, month, day, "tanggal-angka");
+
+    if(result && !m[4]){
+      // Tanpa tahun: pilih kejadian berikutnya hanya jika tanggal+waktu sudah benar-benar lewat.
+      if(result.date < now){
+        result = makeResult(year + 1, month, day, "tanggal-angka");
+      }
+    }
+
+    return result;
   }
 
-  /* DETEKSI HARI */
+  /* 3. TANGGAL NAMA BULAN:
+        28 mei
+        28 mei 2027
+        tanggal 28 mei 2027
+  */
+  const namaBulanPattern = Object.keys(bulan)
+    .sort((a,b) => b.length - a.length)
+    .join("|");
 
-  for(let h in hariMap){
+  const monthRegex = new RegExp(
+    "\\b(?:tgl|tanggal)?\\s*(\\d{1,2})\\s*(" +
+    namaBulanPattern +
+    ")(?:\\s+(\\d{4}))?\\b",
+    "i"
+  );
 
-    if(text.includes(h)){
+  m = clean.match(monthRegex);
 
-      let targetHari=hariMap[h]
+  if(m){
+    const day = Number(m[1]);
+    const month = bulan[m[2]];
+    let year = m[3] ? Number(m[3]) : now.getFullYear();
 
-      let diff=(targetHari-now.getDay()+7)%7
+    let result = makeResult(year, month, day, "tanggal-bulan");
 
-      if(diff===0){
+    if(result && !m[3] && result.date < now){
+      result = makeResult(year + 1, month, day, "tanggal-bulan");
+    }
 
-        let currentMinutes=
-          now.getHours()*60+now.getMinutes()
+    return result;
+  }
 
-        let targetMinutes=
-          jam*60+menit
+  /* 4. NAMA HARI:
+        senin
+        senin 14:00
+        senin depan
+  */
+  for(const [namaHari, targetHari] of Object.entries(hariMap)){
+    const re = new RegExp("\\b" + namaHari + "\\b", "i");
 
-        if(targetMinutes<=currentMinutes){
-          diff=7
-        }
-      }
+    if(!re.test(clean)) continue;
 
-      let result=new Date(
+    let diff = (targetHari - now.getDay() + 7) % 7;
+
+    const pakaiDepan = new RegExp("\\b" + namaHari + "\\s+depan\\b", "i").test(clean);
+
+    if(pakaiDepan && diff === 0){
+      diff = 7;
+    }
+
+    if(diff === 0){
+      // Jika hari sama:
+      // - tanpa jam -> tetap hari ini (akhir hari)
+      // - dengan jam yang sudah lewat -> minggu depan
+      const candidate = makeResult(
         now.getFullYear(),
         now.getMonth(),
-        now.getDate()+diff,
-        jam,
-        menit
-      )
-
-      return result
-    }
-  }
-
-  return null
-}
-
-/* STATUS HARI */
-function getDayStatus(date){
-
-  if(!date) return ""
-
-  let now=new Date()
-
-  let today=new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate()
-  )
-
-  let target=new Date(
-    date.getFullYear(),
-    date.getMonth(),
-    date.getDate()
-  )
-
-  let diff=Math.floor(
-    (target-today)/86400000
-  )
-
-  if(diff===0) return "today"
-
-  if(diff===1) return "tomorrow"
-
-  if(diff===2) return "h2"
-
-  return ""
-}
-
-/* BADGE REALTIME */
-function getRealtimeBadge(date){
-
-  if(!date) return ""
-
-  let diff=date-new Date()
-
-  let jam=diff/3600000
-
-  if(diff<=0){
-    return '<span class="tag todayTag">⛔ LEWAT</span>'
-  }
-
-  if(jam<=1){
-    return '<span class="tag todayTag">🚨 <1 JAM</span>'
-  }
-
-  if(jam<=3){
-    return '<span class="tag todayTag">⚠️ <3 JAM</span>'
-  }
-
-  if(jam<=6){
-    return '<span class="tag tomorrowTag">⏰ <6 JAM</span>'
-  }
-
-  return ""
-}
-
-/* COUNTDOWN */
-function getCountdown(date){
-
-  if(!date) return ""
-
-  let diff=date-new Date()
-
-  if(diff<=0){
-    return "⛔ Deadline terlewat"
-  }
-
-  let hari=Math.floor(diff/86400000)
-
-  let jam=Math.floor(
-    (diff%86400000)/3600000
-  )
-
-  let menit=Math.floor(
-    (diff%3600000)/60000
-  )
-
-  if(hari>0){
-    return `⏳ ${hari} hari ${jam} jam lagi`
-  }
-
-  if(jam>0){
-    return `⏳ ${jam} jam ${menit} menit lagi`
-  }
-
-  return `⏳ ${menit} menit lagi`
-}
-
-/* SORT PRIORITAS */
-function sortPrioritas(){
-
-  data=data
-  .map((d,i)=>({...d,_i:i}))
-  .sort((a,b)=>{
-
-    let da=parseTanggal(a.text)
-    let db=parseTanggal(b.text)
-
-    let now=new Date()
-
-    function rank(item,date){
-
-      if(!date) return 999
-
-      let diff=date-now
-
-      let jam=diff/3600000
-
-      if(diff<=0) return 0
-
-      if(jam<=1) return 1
-
-      if(jam<=3) return 2
-
-      if(jam<=6) return 3
-
-      if(jam<=24) return 4
-
-      if(jam<=48) return 5
-
-      if(jam<=72) return 6
-
-      if(item.progress==="proses") return 7
-
-      if(item.progress==="belum") return 8
-
-      return 9
-    }
-
-    let pa=rank(a,da)
-    let pb=rank(b,db)
-
-    if(pa!==pb) return pa-pb
-
-    if(!da&&!db) return a._i-b._i
-
-    if(!da) return 1
-
-    if(!db) return -1
-
-    return da-db
-
-  }).map(({_i,...r})=>r)
-}
-
-/* TAMBAH */
-function tambah(){
-
-  let lines=document
-    .getElementById("input")
-    .value
-    .split("\n")
-
-  lines.forEach(x=>{
-
-    let clean=x.trim()
-
-    if(!clean) return
-
-    let newText=normalizeText(clean)
-
-    let sudahAda=data.some(
-      d=>normalizeText(d.text)===newText
-    )
-
-    if(!sudahAda){
-
-      data.push({
-        id:genId(),
-        text:clean,
-        progress:"belum"
-      })
-    }
-
-  })
-
-  sortPrioritas()
-
-  simpan()
-
-  render()
-
-  document.getElementById("input").value=""
-}
-
-/* HAPUS */
-function hapus(id){
-
-  data=data.filter(x=>x.id!==id)
-
-  sortPrioritas()
-
-  simpan()
-
-  render()
-}
-
-/* EDIT */
-function edit(id){
-
-  let item=data.find(x=>x.id===id)
-
-  if(!item) return
-
-  let baru=prompt("Edit:",item.text)
-
-  if(baru&&baru.trim()){
-
-    item.text=baru.trim()
-
-    sortPrioritas()
-
-    simpan()
-
-    render()
-  }
-}
-
-/* UPDATE PROGRESS */
-function updateProgress(id,val){
-
-  let item=data.find(x=>x.id===id)
-
-  if(!item) return
-
-  item.progress=val
-
-  sortPrioritas()
-
-  simpan()
-
-  render()
-}
-
-/* RENDER */
-function render(){
-
-  let html=""
-
-  data.forEach(d=>{
-
-    let date=parseTanggal(d.text)
-
-    let day=getDayStatus(date)
-
-    let realtime=getRealtimeBadge(date)
-
-    let countdown=getCountdown(date)
-
-    let isSuper=false
-
-    if(date){
-
-      let diff=date-new Date()
-
-      let jam=diff/3600000
-
-      if(jam<=1){
-        isSuper=true
+        now.getDate(),
+        "nama-hari"
+      );
+
+      if(waktu.hasTime && candidate.date <= now){
+        diff = 7;
       }
     }
 
-    html+=`
-    <div class="card ${d.progress} ${day} ${isSuper?'super-priority':''}">
+    const d = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate() + diff
+    );
 
+    return makeResult(
+      d.getFullYear(),
+      d.getMonth(),
+      d.getDate(),
+      "nama-hari"
+    );
+  }
+
+  /* 5. Hanya jam:
+        "telepon jam 16"
+        -> dianggap hari ini jika belum lewat, kalau sudah lewat -> besok.
+  */
+  if(waktu.hasTime){
+    let result = makeResult(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+      "hanya-jam"
+    );
+
+    if(result.date <= now){
+      const d = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate() + 1
+      );
+
+      result = makeResult(
+        d.getFullYear(),
+        d.getMonth(),
+        d.getDate(),
+        "hanya-jam"
+      );
+    }
+
+    return result;
+  }
+
+  return null;
+}
+
+/* =========================================================
+   DEADLINE TERSIMPAN
+========================================================= */
+
+function getStoredDate(item){
+  if(!item || !item.dueAt) return null;
+
+  const d = new Date(item.dueAt);
+
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
+function applyParsedDeadline(item, referenceDate = new Date()){
+  const parsed = parseTanggal(item.text, referenceDate);
+
+  if(parsed){
+    item.dueAt = parsed.date.toISOString();
+    item.hasTime = parsed.hasTime;
+    item.dateType = parsed.type;
+  }else{
+    item.dueAt = null;
+    item.hasTime = false;
+    item.dateType = null;
+  }
+
+  return item;
+}
+
+/* Migrasi data lama yang belum punya dueAt.
+   Hanya dilakukan sekali saat halaman versi baru pertama kali dibuka. */
+let migrated = false;
+
+data = data.map(item => {
+  if(!("dueAt" in item)){
+    migrated = true;
+    return applyParsedDeadline({
+      ...item,
+      id: item.id || genId(),
+      progress: item.progress || "belum"
+    });
+  }
+
+  return {
+    ...item,
+    id: item.id || genId(),
+    progress: item.progress || "belum"
+  };
+});
+
+if(migrated){
+  simpan();
+}
+
+/* =========================================================
+   STATUS HARI / BADGE / COUNTDOWN
+========================================================= */
+
+function getDayStatus(date){
+  if(!date) return "";
+
+  const diff = diffCalendarDays(date, new Date());
+
+  if(diff === 0) return "today";
+  if(diff === 1) return "tomorrow";
+  if(diff === 2) return "h2";
+
+  return "";
+}
+
+function getRealtimeBadge(date, hasTime){
+  if(!date || !hasTime) return "";
+
+  const diff = date - new Date();
+  const hours = diff / 3600000;
+
+  if(diff <= 0){
+    return '<span class="tag todayTag">⛔ LEWAT</span>';
+  }
+
+  if(hours <= 1){
+    return '<span class="tag todayTag">🚨 &lt;1 JAM</span>';
+  }
+
+  if(hours <= 3){
+    return '<span class="tag todayTag">⚠️ &lt;3 JAM</span>';
+  }
+
+  if(hours <= 6){
+    return '<span class="tag tomorrowTag">⏰ &lt;6 JAM</span>';
+  }
+
+  return "";
+}
+
+function getCountdown(date, hasTime){
+  if(!date) return "";
+
+  const now = new Date();
+  const diff = date - now;
+
+  if(diff <= 0){
+    return "⛔ Deadline terlewat";
+  }
+
+  if(!hasTime){
+    const days = diffCalendarDays(date, now);
+
+    if(days === 0) return "📅 Jatuh tempo hari ini";
+    if(days === 1) return "📅 Jatuh tempo besok";
+    if(days === 2) return "📅 Jatuh tempo lusa";
+
+    return `📅 ${days} hari lagi`;
+  }
+
+  const hari = Math.floor(diff / 86400000);
+  const jam = Math.floor((diff % 86400000) / 3600000);
+  const menit = Math.floor((diff % 3600000) / 60000);
+
+  if(hari > 0){
+    return `⏳ ${hari} hari ${jam} jam lagi`;
+  }
+
+  if(jam > 0){
+    return `⏳ ${jam} jam ${menit} menit lagi`;
+  }
+
+  return `⏳ ${Math.max(0, menit)} menit lagi`;
+}
+
+/* =========================================================
+   SORT PRIORITAS
+========================================================= */
+
+function sortPrioritas(){
+  const now = new Date();
+
+  data = data
+    .map((d, i) => ({...d, _i:i}))
+    .sort((a, b) => {
+      // Yang selesai ditaruh paling bawah.
+      if(a.progress === "selesai" && b.progress !== "selesai") return 1;
+      if(b.progress === "selesai" && a.progress !== "selesai") return -1;
+
+      const da = getStoredDate(a);
+      const db = getStoredDate(b);
+
+      function rank(item, date){
+        if(!date) return item.progress === "proses" ? 80 : 90;
+
+        const diff = date - now;
+        const hours = diff / 3600000;
+
+        if(diff <= 0) return 0;
+        if(item.hasTime && hours <= 1) return 1;
+        if(item.hasTime && hours <= 3) return 2;
+        if(item.hasTime && hours <= 6) return 3;
+        if(hours <= 24) return 4;
+        if(hours <= 48) return 5;
+        if(hours <= 72) return 6;
+        if(item.progress === "proses") return 7;
+        return 8;
+      }
+
+      const pa = rank(a, da);
+      const pb = rank(b, db);
+
+      if(pa !== pb) return pa - pb;
+
+      if(!da && !db) return a._i - b._i;
+      if(!da) return 1;
+      if(!db) return -1;
+
+      return da - db;
+    })
+    .map(({_i, ...rest}) => rest);
+}
+
+/* =========================================================
+   CRUD
+========================================================= */
+
+function tambah(){
+  const input = document.getElementById("input");
+
+  const lines = input.value.split("\n");
+
+  lines.forEach(line => {
+    const clean = line.trim();
+
+    if(!clean) return;
+
+    const newText = normalizeText(clean);
+
+    const sudahAda = data.some(
+      d => normalizeText(d.text) === newText
+    );
+
+    if(!sudahAda){
+      const item = {
+        id: genId(),
+        text: clean,
+        progress: "belum",
+        dueAt: null,
+        hasTime: false,
+        dateType: null
+      };
+
+      applyParsedDeadline(item);
+      data.push(item);
+    }
+  });
+
+  sortPrioritas();
+  simpan();
+  render();
+
+  input.value = "";
+}
+
+function hapus(id){
+  data = data.filter(x => x.id !== id);
+
+  sortPrioritas();
+  simpan();
+  render();
+}
+
+function edit(id){
+  const item = data.find(x => x.id === id);
+
+  if(!item) return;
+
+  const baru = prompt("Edit:", item.text);
+
+  if(baru && baru.trim()){
+    item.text = baru.trim();
+
+    // Parse ulang hanya ketika teks diubah.
+    applyParsedDeadline(item);
+
+    sortPrioritas();
+    simpan();
+    render();
+  }
+}
+
+function updateProgress(id, val){
+  const item = data.find(x => x.id === id);
+
+  if(!item) return;
+
+  item.progress = val;
+
+  sortPrioritas();
+  simpan();
+  render();
+}
+
+/* =========================================================
+   HTML ESCAPE
+========================================================= */
+
+function escapeHtml(value){
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+/* =========================================================
+   RENDER
+========================================================= */
+
+function render(){
+  let html = "";
+
+  data.forEach(d => {
+    const date = getStoredDate(d);
+    const day = getDayStatus(date);
+    const realtime = getRealtimeBadge(date, d.hasTime);
+    const countdown = getCountdown(date, d.hasTime);
+
+    let isSuper = false;
+
+    if(date && d.hasTime && d.progress !== "selesai"){
+      const diff = date - new Date();
+      const hours = diff / 3600000;
+
+      if(diff > 0 && hours <= 1){
+        isSuper = true;
+      }
+    }
+
+    let dateText = "Tidak ada tanggal";
+
+    if(date){
+      const options = {
+        weekday:"long",
+        day:"numeric",
+        month:"long",
+        year:"numeric"
+      };
+
+      if(d.hasTime){
+        options.hour = "2-digit";
+        options.minute = "2-digit";
+      }
+
+      dateText = date.toLocaleString("id-ID", options);
+
+      if(!d.hasTime){
+        dateText += " • tanpa jam";
+      }
+    }
+
+    html += `
+    <div class="card ${d.progress} ${day} ${isSuper ? "super-priority" : ""}">
       <div class="left">
-
         <div class="title">
 
-          ${isSuper
-            ? '<span class="urgent-big">⚠️ SUPER PRIORITAS</span>'
-            : ''
+          ${
+            isSuper
+              ? '<span class="urgent-big">⚠️ SUPER PRIORITAS</span>'
+              : ""
           }
 
           ${
-            day==="today"
+            day === "today"
               ? '<span class="tag todayTag">🔴 HARI INI</span>'
-
-            : day==="tomorrow"
-              ? '<span class="tag tomorrowTag">🟠 BESOK</span>'
-
-            : day==="h2"
-              ? '<span class="tag h2Tag">🔵 H-2</span>'
-
-            : ''
+              : day === "tomorrow"
+                ? '<span class="tag tomorrowTag">🟠 BESOK</span>'
+                : day === "h2"
+                  ? '<span class="tag h2Tag">🔵 H-2</span>'
+                  : ""
           }
 
           ${realtime}
 
-          ${d.text}
+          ${escapeHtml(d.text)}
 
           <select
             class="progress p-${d.progress}"
-            onchange="updateProgress('${d.id}',this.value)"
+            onchange="updateProgress('${d.id}', this.value)"
           >
-
-            <option
-              value="belum"
-              ${d.progress==="belum"?"selected":""}
-            >
+            <option value="belum" ${d.progress === "belum" ? "selected" : ""}>
               Belum
             </option>
 
-            <option
-              value="proses"
-              ${d.progress==="proses"?"selected":""}
-            >
+            <option value="proses" ${d.progress === "proses" ? "selected" : ""}>
               Proses
             </option>
 
-            <option
-              value="selesai"
-              ${d.progress==="selesai"?"selected":""}
-            >
+            <option value="selesai" ${d.progress === "selesai" ? "selected" : ""}>
               Selesai
             </option>
-
           </select>
-
         </div>
 
-        <div class="date">
-
-          ${
-            date
-              ? date.toLocaleString(
-                  "id-ID",
-                  {
-                    weekday:'long',
-                    day:'numeric',
-                    month:'long',
-                    hour:'2-digit',
-                    minute:'2-digit'
-                  }
-                )
-              : "Tidak ada tanggal"
-          }
-
-        </div>
+        <div class="date">${escapeHtml(dateText)}</div>
 
         ${
           date
-            ? `<div class="countdown">${countdown}</div>`
-            : ''
+            ? `<div class="countdown">${escapeHtml(countdown)}</div>`
+            : ""
         }
-
       </div>
 
       <div class="actions">
-
-        <button
-          class="edit"
-          onclick="edit('${d.id}')"
-        >
-          ✏️
-        </button>
-
-        <button
-          class="delete"
-          onclick="hapus('${d.id}')"
-        >
-          🗑️
-        </button>
-
+        <button class="edit" onclick="edit('${d.id}')">✏️</button>
+        <button class="delete" onclick="hapus('${d.id}')">🗑️</button>
       </div>
+    </div>`;
+  });
 
-    </div>`
-  })
-
-  document.getElementById("output").innerHTML=html
+  document.getElementById("output").innerHTML = html;
 }
 
-/* CLOCK */
-setInterval(()=>{
+/* =========================================================
+   CLOCK + AUTO REFRESH
+========================================================= */
 
-  document.getElementById("clock")
-  .innerText=new Date()
-  .toLocaleString("id-ID")
+function updateClock(){
+  document.getElementById("clock").innerText =
+    new Date().toLocaleString("id-ID", {
+      weekday:"long",
+      day:"numeric",
+      month:"long",
+      year:"numeric",
+      hour:"2-digit",
+      minute:"2-digit",
+      second:"2-digit"
+    });
+}
 
-},1000)
+updateClock();
 
-/* AUTO REFRESH */
-setInterval(()=>{
-  render()
-},60000)
+setInterval(updateClock, 1000);
+
+setInterval(() => {
+  sortPrioritas();
+  render();
+}, 60000);
 
 function simpan(){
-  localStorage.setItem(
-    "orders",
-    JSON.stringify(data)
-  )
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
 
-render()
-
+sortPrioritas();
+render();
 </script>
 
 </body>
