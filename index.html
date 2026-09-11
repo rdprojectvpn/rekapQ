@@ -188,6 +188,11 @@ body.light .status-tab.active{background:#22c55e;color:#fff;border-color:#22c55e
   margin-top:4px
 }
 
+.parse-warning{
+  color:#f59e0b;
+  font-weight:600
+}
+
 .countdown{
   font-size:11px;
   color:#38bdf8;
@@ -397,8 +402,7 @@ Follow up 3 hari lagi"></textarea>
 <button class="btn-main" onclick="tambah()">Tambah</button>
 
 <div class="hint">
-  📌 Urutan otomatis: terlambat → hari ini → besok → tanggal berikutnya → tanpa tanggal → selesai.
-  Dalam tanggal yang sama, jam paling awal tampil lebih dulu. Drag/↑↓ tetap berguna untuk item dengan posisi tanggal yang sama atau tanpa tanggal.
+  📌 Deteksi deadline: <b>hari ini 15:30</b> • <b>besok jam 09.00</b> • <b>lusa</b> • <b>Senin 10:00</b> • <b>Senin depan</b> • <b>28 Agustus</b> • <b>28 Agustus 2026</b> • <b>28/08/2026</b> • <b>28-08-2026</b> • <b>2026-08-28</b> • <b>tanggal 25</b>.
 </div>
 
 <div id="clock"></div>
@@ -491,36 +495,39 @@ function diffCalendarDays(a, b){
 ========================================================= */
 
 function parseWaktu(rawText){
-  const text = rawText
+  if(!rawText) {
+    return {hour:23, minute:59, hasTime:false, matchedText:""};
+  }
+
+  const text = String(rawText)
     .toLowerCase()
     .replace(/jum['’]at/g, "jumat");
 
   let hour = null;
   let minute = 0;
-  let partOfDay = null;
+  let period = null;
   let matchedText = "";
 
-  // 1. jam/pukul/pkl 14:30, jam 14.30, pukul 9, pkl 7 malam
+  // jam 09.00 / jam 9 / pukul 9 malam / pkl 7 pagi
   let m = text.match(
-    /\b(?:jam|pukul|pkl)\s*(\d{1,2})(?:\s*[:.]\s*(\d{1,2}))?\s*(pagi|siang|sore|malam)?\b/i
+    /\b(?:jam|pukul|pkl)\s*(\d{1,2})(?:\s*[:.]\s*(\d{1,2}))?\s*(pagi|siang|sore|malam|am|pm)?\b/i
   );
 
   if(m){
     hour = Number(m[1]);
     minute = m[2] == null ? 0 : Number(m[2]);
-    partOfDay = m[3] || null;
+    period = m[3] ? m[3].toLowerCase() : null;
     matchedText = m[0];
   }
 
-  // 2. 14:30 / 14.30
-  if(hour == null){
-    const candidates = [...text.matchAll(/\b(\d{1,2})\s*[:.]\s*(\d{2})\b/g)];
+  // 14:30 / 14.30
+  if(hour === null){
+    const matches = [...text.matchAll(/\b(\d{1,2})\s*[:.]\s*(\d{2})\b/g)];
 
-    for(const c of candidates){
+    for(const c of matches){
       const h = Number(c[1]);
       const min = Number(c[2]);
 
-      // Hindari salah membaca bagian tanggal seperti 28.05 sebagai jam
       if(h >= 0 && h <= 23 && min >= 0 && min <= 59){
         hour = h;
         minute = min;
@@ -530,68 +537,69 @@ function parseWaktu(rawText){
     }
   }
 
-  // 3. 7 pagi / 12 siang / 4 sore / 8 malam
-  if(hour == null){
-    m = text.match(/\b(\d{1,2})\s*(pagi|siang|sore|malam)\b/i);
+  // 9 pagi / 12 siang / 4 sore / 8 malam / 8 pm
+  if(hour === null){
+    m = text.match(
+      /\b(\d{1,2})\s*(pagi|siang|sore|malam|am|pm)\b/i
+    );
 
     if(m){
       hour = Number(m[1]);
       minute = 0;
-      partOfDay = m[2];
+      period = m[2].toLowerCase();
       matchedText = m[0];
     }
   }
 
-  if(hour == null){
-    return {
-      hour: 23,
-      minute: 59,
-      hasTime: false,
-      matchedText: ""
-    };
+  if(hour === null){
+    return {hour:23, minute:59, hasTime:false, matchedText:""};
   }
 
-  // Validasi dasar
-  if(hour < 0 || hour > 23 || minute < 0 || minute > 59){
-    return {
-      hour: 23,
-      minute: 59,
-      hasTime: false,
-      matchedText: ""
-    };
+  if(minute < 0 || minute > 59){
+    return {hour:23, minute:59, hasTime:false, matchedText:""};
   }
 
-  // Konversi keterangan waktu Indonesia
-  if(partOfDay){
-    if(partOfDay === "pagi"){
-      if(hour === 12) hour = 0;
-    }
-    else if(partOfDay === "siang"){
-      if(hour >= 1 && hour <= 11) hour += 12;
-    }
-    else if(partOfDay === "sore"){
-      if(hour >= 1 && hour <= 11) hour += 12;
-    }
-    else if(partOfDay === "malam"){
-      if(hour >= 1 && hour <= 11) hour += 12;
-      else if(hour === 12) hour = 0;
-    }
+  // 12-hour notation hanya bila ada penanda pagi/siang/sore/malam/am/pm.
+  if(period === "am"){
+    if(hour === 12) hour = 0;
+  }else if(period === "pm"){
+    if(hour >= 1 && hour <= 11) hour += 12;
+  }else if(period === "pagi"){
+    if(hour === 12) hour = 0;
+  }else if(period === "siang"){
+    if(hour >= 1 && hour <= 11) hour += 12;
+  }else if(period === "sore"){
+    if(hour >= 1 && hour <= 11) hour += 12;
+  }else if(period === "malam"){
+    if(hour >= 1 && hour <= 11) hour += 12;
+    else if(hour === 12) hour = 0;
+  }else if(hour > 23){
+    return {hour:23, minute:59, hasTime:false, matchedText:""};
+  }
+
+  if(hour < 0 || hour > 23){
+    return {hour:23, minute:59, hasTime:false, matchedText:""};
   }
 
   return {
     hour,
     minute,
-    hasTime: true,
+    hasTime:true,
     matchedText
   };
 }
 
 /* =========================================================
-   PARSER TANGGAL / HARI / WAKTU INDONESIA
-
-   Catatan penting:
-   - Dipanggil saat TAMBAH / EDIT, bukan setiap render.
-   - Ini membuat deadline tidak "geser" sendiri ke minggu/tahun depan.
+   PARSER TANGGAL / HARI / WAKTU INDONESIA — V4
+   Mendukung:
+   - hari ini / besok / lusa / kemarin
+   - senin, senin depan, senin minggu depan
+   - 3 hari lagi / 2 hari lalu
+   - 28 agustus / 28 agustus 2026
+   - 28/08/2026, 28-08-2026, 28.08.2026
+   - 2026-08-28
+   - tanggal 25 / tgl 25
+   - jam 09.00 / 14:30 / 7 malam
 ========================================================= */
 
 function parseTanggal(text, referenceDate = new Date()){
@@ -631,8 +639,9 @@ function parseTanggal(text, referenceDate = new Date()){
     sabtu:6
   };
 
-  const waktu = parseWaktu(clean);
   const now = new Date(referenceDate);
+  const waktu = parseWaktu(clean);
+
   const todayStart = new Date(
     now.getFullYear(),
     now.getMonth(),
@@ -664,17 +673,16 @@ function parseTanggal(text, referenceDate = new Date()){
     return new Date(year, month, day, 0,0,0,0);
   }
 
-  function nextYearOnlyIfCalendarDatePassed(result, explicitYear){
+  function moveToNextYearIfPassed(result, explicitYear){
     if(!result || explicitYear) return result;
 
-    const candidateDay = calendarDate(
+    const d = calendarDate(
       result.date.getFullYear(),
       result.date.getMonth(),
       result.date.getDate()
     );
 
-    // Jika tanggalnya adalah hari ini, jangan lompat tahun meskipun jamnya sudah lewat.
-    if(candidateDay < todayStart){
+    if(d < todayStart){
       return makeResult(
         result.date.getFullYear() + 1,
         result.date.getMonth(),
@@ -686,10 +694,7 @@ function parseTanggal(text, referenceDate = new Date()){
     return result;
   }
 
-  /* ---------------------------------------------------------
-     1. RELATIF
-  --------------------------------------------------------- */
-
+  // 1) RELATIF
   if(/\bhari\s+ini\b|\bsekarang\b/.test(clean)){
     return makeResult(
       now.getFullYear(),
@@ -782,87 +787,58 @@ function parseTanggal(text, referenceDate = new Date()){
     );
   }
 
-  /* ---------------------------------------------------------
-     2. ISO: 2026-08-15
-  --------------------------------------------------------- */
-
-  m = clean.match(
-    /\b(20\d{2})\s*-\s*(\d{1,2})\s*-\s*(\d{1,2})\b/
-  );
+  // 2) ISO: 2026-08-28
+  m = clean.match(/\b(20\d{2})\s*-\s*(\d{1,2})\s*-\s*(\d{1,2})\b/);
 
   if(m){
     const year = Number(m[1]);
     const month = Number(m[2]) - 1;
     const day = Number(m[3]);
 
-    const result = makeResult(
-      year,
-      month,
-      day,
-      "tanggal-iso"
-    );
-
+    const result = makeResult(year, month, day, "tanggal-iso");
     if(result) return result;
   }
 
-  /* ---------------------------------------------------------
-     3. TANGGAL ANGKA:
-        15/08/2026, 15-08-26, 15.08.2026, 15/8
-     Penting: angka jam seperti 14.30 tidak boleh dianggap tanggal.
-  --------------------------------------------------------- */
-
+  // 3) ANGKA: 28/08/2026, 28-08-2026, 28.08.2026
+  // Jika tahun tidak ada, pakai tahun berjalan; jika kalendernya sudah lewat,
+  // gunakan tahun berikutnya. Tanggal yang eksplisit tidak digeser.
   m = clean.match(
     /\b(?:tgl|tanggal)?\s*(\d{1,2})\s*([\/.-])\s*(\d{1,2})(?:\s*\2\s*(\d{2}|\d{4}))?\b/
   );
 
   if(m){
     const day = Number(m[1]);
-    const monthNumber = Number(m[3]);
-    const explicitYear = Boolean(m[4]);
+    const month = Number(m[3]);
 
-    // Hanya dianggap tanggal bila bulan benar 1..12.
-    if(monthNumber >= 1 && monthNumber <= 12){
-      let year = explicitYear
-        ? Number(m[4])
-        : now.getFullYear();
+    if(month >= 1 && month <= 12){
+      const explicitYear = Boolean(m[4]);
+      let year = explicitYear ? Number(m[4]) : now.getFullYear();
 
       if(year < 100) year += 2000;
 
       let result = makeResult(
         year,
-        monthNumber - 1,
+        month - 1,
         day,
         "tanggal-angka"
       );
 
       if(result){
-        result = nextYearOnlyIfCalendarDatePassed(
-          result,
-          explicitYear
-        );
-
+        result = moveToNextYearIfPassed(result, explicitYear);
         return result;
       }
     }
-    // Jika tidak valid sebagai tanggal, lanjutkan parser.
-    // Contoh "jam 14.30" tetap bisa terbaca sebagai waktu.
   }
 
-  /* ---------------------------------------------------------
-     4. TANGGAL DENGAN NAMA BULAN:
-        15 agustus
-        15 agustus 2026
-        tanggal 15 agustus 2026
-  --------------------------------------------------------- */
-
-  const namaBulanPattern = Object.keys(bulan)
+  // 4) NAMA BULAN: 28 Agustus / 28 Agustus 2026
+  const monthNames = Object.keys(bulan)
     .sort((a,b) => b.length - a.length)
     .join("|");
 
   const monthRegex = new RegExp(
-    "\\\\b(?:tgl|tanggal)?\\\\s*(\\\\d{1,2})\\\\s*(" +
-    namaBulanPattern +
-    ")(?:\\\\s+(\\\\d{4}))?\\\\b",
+    "\\b(?:tgl|tanggal)?\\s*(\\d{1,2})\\s*(" +
+    monthNames +
+    ")(?:\\s+(\\d{4}))?\\b",
     "i"
   );
 
@@ -870,11 +846,9 @@ function parseTanggal(text, referenceDate = new Date()){
 
   if(m){
     const day = Number(m[1]);
-    const month = bulan[m[2]];
+    const month = bulan[m[2].toLowerCase()];
     const explicitYear = Boolean(m[3]);
-    const year = explicitYear
-      ? Number(m[3])
-      : now.getFullYear();
+    const year = explicitYear ? Number(m[3]) : now.getFullYear();
 
     let result = makeResult(
       year,
@@ -884,20 +858,13 @@ function parseTanggal(text, referenceDate = new Date()){
     );
 
     if(result){
-      result = nextYearOnlyIfCalendarDatePassed(
-        result,
-        explicitYear
-      );
-
+      result = moveToNextYearIfPassed(result, explicitYear);
       return result;
     }
   }
 
-  /* ---------------------------------------------------------
-     5. "tanggal 15" / "tgl 15"
-        Bulan sekarang; jika harinya sudah lewat, bulan berikutnya.
-  --------------------------------------------------------- */
-
+  // 5) "tanggal 25" / "tgl 25"
+  // Bulan berjalan. Jika tanggal kalender sudah lewat, pindah ke bulan berikutnya.
   m = clean.match(/\b(?:tgl|tanggal)\s*(\d{1,2})\b/);
 
   if(m){
@@ -914,18 +881,14 @@ function parseTanggal(text, referenceDate = new Date()){
     );
 
     if(result){
-      const candidateDay = calendarDate(
-        year,
-        month,
-        day
-      );
+      const candidate = calendarDate(year, month, day);
 
-      if(candidateDay < todayStart){
-        month += 1;
+      if(candidate < todayStart){
+        month++;
 
         if(month > 11){
           month = 0;
-          year += 1;
+          year++;
         }
 
         result = makeResult(
@@ -940,21 +903,11 @@ function parseTanggal(text, referenceDate = new Date()){
     }
   }
 
-  /* ---------------------------------------------------------
-     6. NAMA HARI:
-        senin
-        senin 14:00
-        senin depan
-        senin minggu depan
-  --------------------------------------------------------- */
-
+  // 6) NAMA HARI
   for(const [namaHari, targetHari] of Object.entries(hariMap)){
-    const re = new RegExp(
-      "\\\\b" + namaHari + "\\\\b",
-      "i"
-    );
-
-    if(!re.test(clean)) continue;
+    if(!new RegExp("\\b" + namaHari + "\\b", "i").test(clean)){
+      continue;
+    }
 
     let diff = (
       targetHari -
@@ -963,39 +916,35 @@ function parseTanggal(text, referenceDate = new Date()){
     ) % 7;
 
     const mingguDepan = new RegExp(
-      "\\\\b" + namaHari + "\\\\s+(?:minggu|pekan)\\\\s+depan\\\\b",
+      "\\b" + namaHari + "\\s+(?:minggu|pekan)\\s+depan\\b",
       "i"
     ).test(clean);
 
     const hariDepan = new RegExp(
-      "\\\\b" + namaHari + "\\\\s+depan\\\\b",
+      "\\b" + namaHari + "\\s+depan\\b",
       "i"
     ).test(clean);
 
     if(mingguDepan){
-      // Masuk ke hari yang dimaksud pada minggu kalender berikutnya.
       diff = diff === 0 ? 7 : diff + 7;
-    }
-    else if(hariDepan && diff === 0){
-      diff = 7;
-    }
-    else if(diff === 0){
-      // Nama hari yang sama + jam sudah lewat diasumsikan minggu berikutnya.
-      // Untuk memaksa hari ini gunakan kata "hari ini".
-      const candidate = makeResult(
+    }else if(hariDepan){
+      diff = diff === 0 ? 7 : diff;
+    }else if(diff === 0 && waktu.hasTime){
+      // "Senin 10:00" pada Senin yang sama:
+      // jika jam belum lewat, berarti hari ini; jika sudah lewat, minggu depan.
+      const sameDay = makeResult(
         now.getFullYear(),
         now.getMonth(),
         now.getDate(),
         "nama-hari"
       );
 
-      if(
-        waktu.hasTime &&
-        candidate &&
-        candidate.date <= now
-      ){
+      if(sameDay && sameDay.date <= now){
         diff = 7;
       }
+    }else if(diff === 0 && !waktu.hasTime){
+      // "Senin" saat hari ini Senin = hari ini.
+      diff = 0;
     }
 
     const d = new Date(
@@ -1012,13 +961,7 @@ function parseTanggal(text, referenceDate = new Date()){
     );
   }
 
-  /* ---------------------------------------------------------
-     7. HANYA JAM:
-        telepon jam 16
-        meeting 14.30
-     Jika jam hari ini sudah lewat -> besok.
-  --------------------------------------------------------- */
-
+  // 7) HANYA JAM
   if(waktu.hasTime){
     let result = makeResult(
       now.getFullYear(),
@@ -1047,10 +990,6 @@ function parseTanggal(text, referenceDate = new Date()){
 
   return null;
 }
-
-/* =========================================================
-   DEADLINE TERSIMPAN
-========================================================= */
 
 function getStoredDate(item){
   if(!item || !item.dueAt) return null;
@@ -1634,7 +1573,7 @@ function render(){
       if(diff > 0 && hours <= 1) isSuper = true;
     }
 
-    let dateText = "Tidak ada tanggal";
+    let dateText = "Tidak ada tanggal / waktu";
     if(date){
       const options = {
         weekday:"long",
@@ -1690,7 +1629,7 @@ function render(){
           </select>
         </div>
 
-        <div class="date">${escapeHtml(dateText)}</div>
+        <div class="date">${escapeHtml(dateText)}${date ? "" : '<span class="parse-warning"> ⚠️ Deadline tidak terdeteksi</span>'}</div>
         ${date ? `<div class="countdown">${escapeHtml(countdown)}</div>` : ''}
         ${d.note ? `<div class="note">📝 ${escapeHtml(d.note)}</div>` : ''}
 
