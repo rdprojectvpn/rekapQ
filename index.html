@@ -57,7 +57,49 @@ button{
   color:#94a3b8
 }
 
-.container{margin-top:20px}
+/* STATUS TABS */
+.status-tabs{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:7px;
+  margin-top:18px
+}
+.status-tab{
+  padding:10px 8px;
+  background:#1e293b;
+  color:#cbd5e1;
+  border:1px solid #334155;
+  border-radius:10px;
+  font-weight:700;
+  font-size:12px
+}
+.status-tab.active{
+  background:#22c55e;
+  color:#fff;
+  border-color:#22c55e
+}
+.status-count{opacity:.8;margin-left:4px}
+body.light .status-tab{background:#fff;color:#475569;border-color:#cbd5e1}
+body.light .status-tab.active{background:#22c55e;color:#fff;border-color:#22c55e}
+
+
+.bulk-actions{
+  margin-top:10px;
+  display:flex;
+  justify-content:flex-end
+}
+.delete-all{
+  background:#dc2626;
+  color:#fff;
+  padding:8px 12px;
+  font-weight:bold;
+  border-radius:8px
+}
+.delete-all:hover{
+  filter:brightness(1.08)
+}
+
+.container{margin-top:12px}
 
 .card{
   background:#1e293b;
@@ -264,31 +306,6 @@ body.light .dash-card{
   white-space:pre-wrap
 }
 
-.category-wrap{
-  display:inline-flex;
-  align-items:center;
-  gap:4px;
-  margin-top:5px
-}
-
-.category-select{
-  font-size:11px;
-  padding:4px 7px;
-  border-radius:6px;
-  border:none;
-  color:#fff;
-  max-width:135px
-}
-
-.category-color{
-  width:29px;
-  height:24px;
-  padding:0;
-  border:none;
-  border-radius:6px;
-  background:transparent;
-  cursor:pointer
-}
 
 .note-btn{background:#8b5cf6;color:#fff}
 
@@ -392,6 +409,14 @@ Follow up 3 hari lagi"></textarea>
   <div class="dash-card"><span class="dash-number" id="dashTomorrow">0</span><span class="dash-label">🟠 Besok</span></div>
   <div class="dash-card"><span class="dash-number" id="dashWeek">0</span><span class="dash-label">📅 Minggu Ini</span></div>
 </div>
+<div class="status-tabs" role="tablist" aria-label="Status order">
+  <button class="status-tab" id="tab-proses" onclick="setStatusTab('proses')">🔄 Sedang Diproses <span class="status-count" id="count-proses">0</span></button>
+  <button class="status-tab active" id="tab-belum" onclick="setStatusTab('belum')">⏳ Belum <span class="status-count" id="count-belum">0</span></button>
+  <button class="status-tab" id="tab-selesai" onclick="setStatusTab('selesai')">✅ Selesai <span class="status-count" id="count-selesai">0</span></button>
+</div>
+<div class="bulk-actions">
+  <button class="delete-all" onclick="hapusSemuaData()">🗑️ Hapus Semua Data</button>
+</div>
 
 <div class="container" id="output"></div>
 
@@ -404,15 +429,6 @@ Follow up 3 hari lagi"></textarea>
 const STORAGE_KEY = "orders";
 const SETTINGS_KEY = "orderManagerSettings";
 
-const CATEGORY_PRESETS = {
-  "Umum":"#64748b",
-  "Kerja":"#3b82f6",
-  "Pribadi":"#8b5cf6",
-  "Servis":"#f97316",
-  "Meeting":"#06b6d4",
-  "Pengiriman":"#eab308",
-  "Penting":"#ef4444"
-};
 
 let settings = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{"theme":"dark"}');
 let data = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
@@ -1123,8 +1139,6 @@ data = data.map(item => {
     id: item.id || genId(),
     progress: item.progress || "belum",
     note: item.note || "",
-    category: item.category || "Umum",
-    categoryColor: item.categoryColor || CATEGORY_PRESETS[item.category || "Umum"] || CATEGORY_PRESETS.Umum
   };
 
   if(!("dueAt" in next)){
@@ -1132,7 +1146,13 @@ data = data.map(item => {
     applyParsedDeadline(next);
   }
 
-  if(!("note" in item) || !("category" in item) || !("categoryColor" in item)){
+  if(!("note" in item)){
+    migrated = true;
+  }
+
+  if("category" in next || "categoryColor" in next){
+    delete next.category;
+    delete next.categoryColor;
     migrated = true;
   }
 
@@ -1331,42 +1351,52 @@ function sortPrioritas(){
 }
 
 /* =========================================================
-   CRUD + CATATAN + UNDO + KATEGORI + MANUAL ORDER
+   CRUD + CATATAN + UNDO + MANUAL ORDER
 ========================================================= */
 
 function tambah(){
   const input = document.getElementById("input");
   const lines = input.value.split("\n");
+  let added = 0;
+  let duplicate = 0;
 
   lines.forEach(line => {
     const clean = line.trim();
     if(!clean) return;
 
     const newText = normalizeText(clean);
+
+    // Duplikat dicek terhadap semua order yang sudah ada DAN
+    // terhadap order baru lain pada input yang sama.
     const sudahAda = data.some(d => normalizeText(d.text) === newText);
 
-    if(!sudahAda){
-      const item = {
-        id: genId(),
-        text: clean,
-        progress: "belum",
-        note: "",
-        category: "Umum",
-        categoryColor: CATEGORY_PRESETS.Umum,
-        dueAt: null,
-        hasTime: false,
-        dateType: null
-      };
-
-      applyParsedDeadline(item);
-      // Task baru di atas, setelah itu urutan sepenuhnya manual.
-      data.unshift(item);
+    if(sudahAda){
+      duplicate++;
+      return;
     }
+
+    const item = {
+      id: genId(),
+      text: clean,
+      progress: "belum",
+      note: "",
+      dueAt: null,
+      hasTime: false,
+      dateType: null
+    };
+
+    applyParsedDeadline(item);
+    data.unshift(item);
+    added++;
   });
 
   simpan();
   render();
   input.value = "";
+
+  if(duplicate > 0){
+    showInfoToast(`ℹ️ ${duplicate} order duplikat diabaikan${added ? ` • ${added} order baru ditambahkan` : ""}`);
+  }
 }
 
 function hapus(id){
@@ -1391,6 +1421,22 @@ function showUndoToast(text){
     document.getElementById("undoToast").classList.remove("show");
     deletedSnapshot = null;
   }, 7000);
+}
+
+function showInfoToast(text){
+  const el = document.getElementById("undoText");
+  const toast = document.getElementById("undoToast");
+  const button = toast.querySelector("button");
+
+  clearTimeout(undoTimer);
+  el.innerText = text;
+  button.style.display = "none";
+  toast.classList.add("show");
+
+  undoTimer = setTimeout(() => {
+    toast.classList.remove("show");
+    button.style.display = "inline-block";
+  }, 3000);
 }
 
 function undoDelete(){
@@ -1442,22 +1488,6 @@ function updateProgress(id, val){
   render();
 }
 
-function updateCategory(id, category){
-  const item = data.find(x => x.id === id);
-  if(!item) return;
-  item.category = category;
-  item.categoryColor = CATEGORY_PRESETS[category] || item.categoryColor || CATEGORY_PRESETS.Umum;
-  simpan();
-  render();
-}
-
-function updateCategoryColor(id, color){
-  const item = data.find(x => x.id === id);
-  if(!item) return;
-  item.categoryColor = color;
-  simpan();
-  render();
-}
 
 /* DRAG & DROP DESKTOP */
 function dragStart(event, id){
@@ -1525,8 +1555,55 @@ function escapeHtml(value){
 }
 
 /* =========================================================
+   STATUS TABS
+========================================================= */
+let activeStatusTab = localStorage.getItem("activeStatusTab") || "belum";
+
+function setStatusTab(status){
+  activeStatusTab = status;
+  localStorage.setItem("activeStatusTab", status);
+  render();
+}
+
+function updateStatusTabs(){
+  const counts = {proses:0, belum:0, selesai:0};
+
+  data.forEach(item => {
+    const status = item.progress === "proses" ? "proses" : item.progress === "selesai" ? "selesai" : "belum";
+    counts[status]++;
+  });
+
+  document.getElementById("count-proses").innerText = counts.proses;
+  document.getElementById("count-belum").innerText = counts.belum;
+  document.getElementById("count-selesai").innerText = counts.selesai;
+
+  document.querySelectorAll(".status-tab").forEach(btn => btn.classList.remove("active"));
+  const active = document.getElementById("tab-" + activeStatusTab);
+  if(active) active.classList.add("active");
+}
+
+/* =========================================================
    RENDER
 ========================================================= */
+
+
+function hapusSemuaData(){
+  if(!data.length){
+    alert("Tidak ada data untuk dihapus.");
+    return;
+  }
+
+  const yakin = confirm(
+    "Hapus SEMUA orderan?\\n\\n" +
+    "Semua data Belum, Sedang Diproses, dan Selesai akan dihapus permanen dari perangkat ini."
+  );
+
+  if(!yakin) return;
+
+  data = [];
+  localStorage.removeItem(STORAGE_KEY);
+  render();
+}
 
 function render(){
   // Selalu tampilkan urutan pengerjaan paling relevan.
@@ -1534,11 +1611,17 @@ function render(){
 
   let html = "";
 
-  if(data.length === 0){
-    html = '<div class="empty">Belum ada task.<br>Tambahkan order atau jadwal di atas.</div>';
+  const visibleData = data.filter(d => {
+    const status = d.progress === "proses" ? "proses" : d.progress === "selesai" ? "selesai" : "belum";
+    return status === activeStatusTab;
+  });
+
+  if(visibleData.length === 0){
+    const label = activeStatusTab === "proses" ? "sedang diproses" : activeStatusTab === "selesai" ? "selesai" : "belum";
+    html = `<div class="empty">Tidak ada order ${label}.<br>Tambahkan order atau pindahkan statusnya.</div>`;
   }
 
-  data.forEach(d => {
+  visibleData.forEach(d => {
     const date = getStoredDate(d);
     const day = getDayStatus(date);
     const realtime = getRealtimeBadge(date, d.hasTime);
@@ -1569,10 +1652,6 @@ function render(){
       if(!d.hasTime) dateText += " • tanpa jam";
     }
 
-    const categoryOptions = Object.keys(CATEGORY_PRESETS).map(cat => `
-      <option value="${escapeHtml(cat)}" ${d.category === cat ? "selected" : ""}>${escapeHtml(cat)}</option>
-    `).join("");
-
     html += `
     <div
       class="card ${d.progress} ${day} ${isSuper ? "super-priority" : ""}"
@@ -1599,7 +1678,6 @@ function render(){
                 ? '<span class="tag h2Tag">🔵 H-2</span>'
                 : ''}
           ${realtime}
-          <span class="tag" style="background:${escapeHtml(d.categoryColor)}">${escapeHtml(d.category)}</span>
           ${escapeHtml(d.text)}
 
           <select
@@ -1610,22 +1688,6 @@ function render(){
             <option value="proses" ${d.progress === "proses" ? "selected" : ""}>Proses</option>
             <option value="selesai" ${d.progress === "selesai" ? "selected" : ""}>Selesai</option>
           </select>
-        </div>
-
-        <div class="category-wrap">
-          <select
-            class="category-select"
-            style="background:${escapeHtml(d.categoryColor)}"
-            onchange="updateCategory('${escapeHtml(d.id)}',this.value)"
-          >${categoryOptions}</select>
-
-          <input
-            class="category-color"
-            type="color"
-            value="${escapeHtml(d.categoryColor)}"
-            title="Pilih warna kategori"
-            onchange="updateCategoryColor('${escapeHtml(d.id)}',this.value)"
-          >
         </div>
 
         <div class="date">${escapeHtml(dateText)}</div>
@@ -1648,6 +1710,7 @@ function render(){
 
   document.getElementById("output").innerHTML = html;
   updateDashboard();
+  updateStatusTabs();
 }
 
 /* =========================================================
