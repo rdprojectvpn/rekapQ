@@ -95,6 +95,22 @@ footer{border-top:1px solid var(--border);padding:25px 16px;color:var(--muted);t
   .dashboard{grid-template-columns:repeat(2,1fr)}.info-grid{grid-template-columns:1fr}
   .card{align-items:flex-start}.actions{width:76px}
 }
+
+.ad-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+  margin: 15px 0;
+}
+.ad-wrapper .ad-slot {
+  margin: 0; /* Menghapus margin bawaan agar sejajar */
+  border: none;
+  background: transparent;
+  flex: 1 1 auto;
+  max-width: fit-content;
+}
+     
 </style>
 </head>
 
@@ -231,6 +247,8 @@ Cetak label tanggal 25"></textarea>
 </div>
      
   <div id="output" class="container"></div>
+
+<div class="ad-wrapper">     
   <!-- IKLANNN -->   
  <div class="ad-slot" style="border:none; background:transparent; display:flex; justify-content:center; align-items:center; min-height:50px;">
   <!-- TEMPEL KODE ADSTERRA ANDA DI BAWAH INI -->
@@ -388,7 +406,7 @@ Cetak label tanggal 25"></textarea>
 <script src="https://www.highrevenueformat.com/1f15e79377ab8e579b58a0adede7d852/invoke.js"></script>
   <!-- BATAS KODE ADSTERRA -->
 </div>
-
+</div>
      <!-- IKLANNN --> 
 
      
