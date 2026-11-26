@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="google-site-verification" content="tuwIC2r9AlKlvY7EfGxf12h9E3UaU9T2xeXRM_5UAuw">
+  <meta name="description" content="Order Manager PRO+ adalah aplikasi web ringan untuk mencatat order, mengatur deadline, memantau status pekerjaan, dan mengelola prioritas.">
+  <meta name="theme-color" content="#0b1220">
+  <title>Order Manager PRO+ — Kelola Order & Deadline</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href="#home" data-page="home">📦 Order Manager PRO+<small>Kelola order &amp; deadline dengan lebih rapi</small></a>
+    <nav class="nav" aria-label="Navigasi utama">
+      <button id="nav-home"  data-page="home">Beranda</button>
+      <button id="nav-app"   data-page="app">Aplikasi</button>
+      <button id="nav-guide" data-page="guide">Panduan</button>
+      <button id="nav-faq"   data-page="faq">FAQ</button>
+      <button id="nav-about" data-page="about">Tentang</button>
+    </nav>
+    <button class="icon-btn" id="themeBtn" title="Ganti tema gelap / terang" aria-label="Ganti tema">🌓</button>
+  </div>
+</header>
+
+<main>
+
+<!-- ===================== BERANDA ===================== -->
+<section id="page-home" class="page">
+  <div class="wrap">
+    <div class="hero">
+      <div>
+        <h1>Kelola order dan <em>deadline</em> tanpa ribet.</h1>
+        <p>Catat order, tentukan deadline dengan bahasa sehari-hari, pantau status pekerjaan, dan biarkan prioritas tersusun otomatis.</p>
+        <div class="hero-cta">
+          <button class="btn btn-primary btn-lg" data-page="app">📋 Buka Order Manager</button>
+          <button class="btn btn-ghost btn-lg" data-page="guide">📖 Lihat panduan</button>
+        </div>
+      </div>
+
+      <!-- Pratinjau statis -->
+      <div class="preview" aria-hidden="true">
+        <div class="order today">
+          <div class="drag-handle">☷</div>
+          <div><div class="title"><span class="tag red">🔴 HARI INI</span>Servis motor hari ini 15:30</div><div class="meta"><span>Kamis, 15:30</span><span class="countdown">⏳ 3 jam lagi</span></div></div>
+          <span class="progress p-proses">Proses</span><span></span>
+        </div>
+        <div class="order tomorrow">
+          <div class="drag-handle">☷</div>
+          <div><div class="title"><span class="tag orange">🟠 BESOK</span>Meeting besok jam 09.00</div><div class="meta"><span>Jumat, 09:00</span><span class="countdown">⏳ 1 hari lagi</span></div></div>
+          <span class="progress p-belum">Belum</span><span></span>
+        </div>
+        <div class="order selesai">
+          <div class="drag-handle">☷</div>
+          <div><div class="title">Cetak banner Senin 10:00</div><div class="meta"><span>Senin, 10:00</span></div></div>
+          <span class="progress p-selesai">Selesai</span><span></span>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title" style="margin-top:8px">Kenapa menggunakan Order Manager?</h2>
+    <div class="feature-grid">
+      <article class="feature"><div class="ico">⏰</div><h3>Deadline lebih jelas</h3><p>Masukkan hari, tanggal, bulan, atau jam dengan bahasa yang biasa Anda gunakan.</p></article>
+      <article class="feature"><div class="ico">📊</div><h3>Status pekerjaan</h3><p>Pisahkan order menjadi Belum, Sedang Diproses, dan Selesai.</p></article>
+      <article class="feature"><div class="ico">🎯</div><h3>Prioritas otomatis</h3><p>Order terdekat dan yang terlambat ditempatkan lebih atas.</p></article>
+      <article class="feature"><div class="ico">⚡</div><h3>Ringan &amp; cepat</h3><p>Berbasis HTML, CSS, dan JavaScript. Langsung dipakai dari browser, tanpa akun.</p></article>
+    </div>
+
+    <h2 class="section-title">Contoh penulisan deadline</h2>
+    <div class="chips">
+      <span class="chip">hari ini 15:30</span><span class="chip">besok jam 09.00</span><span class="chip">lusa</span>
+      <span class="chip">Senin 10:00</span><span class="chip">Senin depan</span><span class="chip">3 hari lagi</span>
+      <span class="chip">28 Agustus</span><span class="chip">28/08/2026</span><span class="chip">2026-08-28</span><span class="chip">tanggal 25</span>
+    </div>
+
+    <div class="cta-box">
+      <div><h3>Mulai sekarang</h3><p>Tidak perlu membuat akun. Data disimpan di browser/perangkat yang Anda gunakan.</p></div>
+      <button class="btn btn-primary btn-lg" data-page="app">Buka Order Manager →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== APLIKASI ===================== -->
+<section id="page-app" class="page">
+  <div class="wrap">
+    <div class="app-layout">
+
+      <aside class="side">
+        <div class="panel">
+          <h2>➕ Tambah order</h2>
+          <textarea id="input" aria-label="Daftar order, satu per baris" placeholder="Satu order per baris. Contoh:
+Servis motor hari ini 15:30
+Meeting besok jam 09.00
+Ambil barang lusa
+Cetak banner Senin 10:00
+Kirim paket Senin depan
+Order kartu 28 Agustus
+Deadline 28 Agustus 2026 13:00
+Pesanan 28/08/2026
+Cetak label tanggal 25"></textarea>
+          <button class="btn btn-primary btn-block" id="btnTambah" style="margin-top:12px">Tambah Order</button>
+          <p class="hint"><kbd>Ctrl</kbd> + <kbd>Enter</kbd> untuk menambah cepat. Deadline dibaca otomatis jika ada.</p>
+        </div>
+
+        <div class="dashboard">
+          <div class="dash over"><b id="dash-over">0</b><span>Lewat deadline</span></div>
+          <div class="dash today"><b id="dash-today">0</b><span>Hari ini</span></div>
+          <div class="dash tomorrow"><b id="dash-tomorrow">0</b><span>Besok</span></div>
+          <div class="dash"><b id="dash-week">0</b><span>7 hari ke depan</span></div>
+        </div>
+
+        <div id="clock"></div>
+        <button class="danger-link" id="btnHapusSemua">Hapus semua data…</button>
+      </aside>
+
+      <section>
+        <div class="list-head">
+          <div class="status-tabs" role="tablist">
+            <button class="status-tab" id="tab-belum"  data-tab="belum">⏳ Belum <span id="count-belum">0</span></button>
+            <button class="status-tab" id="tab-proses" data-tab="proses">🔄 Diproses <span id="count-proses">0</span></button>
+            <button class="status-tab" id="tab-selesai" data-tab="selesai">✅ Selesai <span id="count-selesai">0</span></button>
+          </div>
+          <div class="list-tools">
+            <input id="search" class="search" type="search" placeholder="Cari order…  ( / )" aria-label="Cari order">
+            <select id="sortMode" class="select" aria-label="Urutan">
+              <option value="deadline">Urut deadline</option>
+              <option value="manual">Urut manual</option>
+            </select>
+          </div>
+        </div>
+        <p class="small muted" style="margin:0 0 12px">💡 Geser kartu (☷) atau gunakan ▲ ▼ untuk mengatur urutan sendiri — mode otomatis pindah ke “Urut manual”.</p>
+        <div id="output"></div>
+      </section>
+
+    </div>
+  </div>
+</section>
+
+<!-- ===================== PANDUAN ===================== -->
+<section id="page-guide" class="page">
+  <div class="wrap">
+    <div class="page-head"><h1>📖 Panduan</h1><p>Cara menggunakan fitur utama Order Manager PRO+.</p></div>
+    <div class="info-grid">
+      <article class="info-card"><h3>1. Tambah order</h3><p>Masukkan satu order per baris lalu tekan <b>Tambah Order</b>. Jika teks yang sama sudah ada, order baru tidak akan dimasukkan.</p></article>
+      <article class="info-card"><h3>2. Tulis deadline</h3><p>Contoh: <b>hari ini 15:30</b>, <b>besok jam 09.00</b>, <b>lusa</b>, <b>Senin 10:00</b>, <b>Senin depan</b>, <b>28 Agustus</b>, <b>28 Agustus 2026</b>, <b>28/08/2026</b>, <b>28-08-2026</b>, <b>2026-08-28</b>, atau <b>tanggal 25</b>.</p></article>
+      <article class="info-card"><h3>3. Status</h3><p>Gunakan tiga tab untuk memisahkan order <b>Belum</b>, <b>Diproses</b>, dan <b>Selesai</b>. Ubah status lewat pilihan di tiap kartu.</p></article>
+      <article class="info-card"><h3>4. Prioritas</h3><p>Pada mode <b>Urut deadline</b>, deadline yang lewat atau paling dekat otomatis berada di atas. Order tanpa tanggal berada setelah order terjadwal.</p></article>
+      <article class="info-card"><h3>5. Urut manual</h3><p>Geser kartu atau gunakan tombol ▲ ▼ untuk mengatur prioritas sendiri. Mode otomatis berpindah ke <b>Urut manual</b>.</p></article>
+      <article class="info-card"><h3>6. Edit, catatan &amp; Undo</h3><p>Tombol ✏️ membuka form edit teks dan catatan. Setelah menghapus order, tekan <b>Undo</b> dalam beberapa detik untuk mengembalikannya.</p></article>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FAQ ===================== -->
+<section id="page-faq" class="page">
+  <div class="wrap prose">
+    <div class="page-head"><h1>❓ FAQ</h1><p>Pertanyaan yang sering ditanyakan.</p></div>
+    <details open><summary>Apakah data saya tersimpan?</summary><p>Ya. Versi ini menggunakan penyimpanan browser (localStorage). Menghapus data browser atau berpindah perangkat dapat menghilangkan data lokal.</p></details>
+    <details><summary>Apakah saya perlu login?</summary><p>Tidak untuk versi lokal ini.</p></details>
+    <details><summary>Apakah tanggal otomatis akurat?</summary><p>Parser menggunakan tanggal dan waktu perangkat. Untuk deadline, sebaiknya tuliskan waktu jika jam benar-benar penting.</p></details>
+    <details><summary>Bagaimana jika deadline tidak dikenali?</summary><p>Kartu akan menampilkan peringatan bahwa deadline tidak terdeteksi. Gunakan salah satu format pada Panduan.</p></details>
+    <details><summary>Apakah data bisa diakses dari HP lain?</summary><p>Belum pada versi localStorage. Untuk sinkronisasi antarperangkat, aplikasi perlu backend/database.</p></details>
+  </div>
+</section>
+
+<!-- ===================== TENTANG ===================== -->
+<section id="page-about" class="page">
+  <div class="wrap prose">
+    <div class="page-head"><h1>ℹ️ Tentang Order Manager PRO+</h1><p>Aplikasi web sederhana untuk membantu pengelolaan pekerjaan dan order harian.</p></div>
+    <div class="info-card doc">
+      <h3>Tujuan</h3><p class="muted">Order Manager PRO+ dibuat untuk membantu pengguna mencatat pekerjaan, deadline, dan progres dalam satu tampilan yang ringan.</p>
+      <h3>Privasi data</h3><p class="muted">Pada versi ini, data order utama disimpan di browser pengguna. Jangan memasukkan informasi sensitif yang tidak diperlukan.</p>
+      <h3>Kontak</h3><p class="muted">Untuk pertanyaan, saran, atau laporan masalah, silakan gunakan alamat kontak yang Anda tetapkan pada versi publik situs.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== PRIVASI ===================== -->
+<section id="page-privacy" class="page">
+  <div class="wrap prose">
+    <div class="page-head"><h1>🔒 Privacy Policy</h1></div>
+    <div class="info-card doc">
+      <p>Kebijakan Privasi ini menjelaskan bagaimana situs Order Manager PRO+ menangani informasi ketika Anda menggunakan layanan.</p>
+      <h3>Data aplikasi</h3><p class="muted">Order yang Anda masukkan pada versi ini disimpan secara lokal di browser menggunakan localStorage. Data tersebut tidak otomatis dikirim ke server oleh aplikasi inti ini.</p>
+      <h3>Cookies dan pihak ketiga</h3><p class="muted">Situs ini tidak menampilkan iklan. Jika di kemudian hari ditambahkan layanan pihak ketiga (misalnya iklan atau analitik), bagian ini akan diperbarui.</p>
+      <h3>Pengelolaan data</h3><p class="muted">Anda dapat menghapus order melalui fitur penghapusan di aplikasi. Anda juga dapat menghapus data situs dari pengaturan browser.</p>
+      <h3>Perubahan</h3><p class="muted">Kebijakan ini dapat diperbarui apabila fitur atau layanan pihak ketiga berubah.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SYARAT ===================== -->
+<section id="page-terms" class="page">
+  <div class="wrap prose">
+    <div class="page-head"><h1>📜 Terms &amp; Conditions</h1></div>
+    <div class="info-card doc">
+      <p>Dengan menggunakan Order Manager PRO+, Anda memahami bahwa aplikasi ini merupakan alat bantu pencatatan dan pengingat deadline.</p>
+      <h3>Ketepatan deadline</h3><p class="muted">Parser tanggal menggunakan waktu perangkat dan pola bahasa tertentu. Pengguna tetap bertanggung jawab memeriksa deadline penting.</p>
+      <h3>Penyimpanan</h3><p class="muted">Versi localStorage tidak menjamin data tetap tersedia setelah data browser dihapus, perangkat diganti, atau browser mengalami perubahan.</p>
+      <h3>Penggunaan wajar</h3><p class="muted">Gunakan layanan secara wajar dan jangan memasukkan konten yang melanggar hukum atau hak pihak lain.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== KONTAK ===================== -->
+<section id="page-contact" class="page">
+  <div class="wrap prose">
+    <div class="page-head"><h1>📞 Kontak</h1></div>
+    <div class="info-card">
+      <p>Untuk pertanyaan, saran, atau laporan bug, gunakan kanal kontak yang Anda tetapkan untuk situs ini.</p>
+      <p class="muted">Tempatkan email bisnis atau formulir kontak Anda di sini sebelum publikasi final.</p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="footer-links">
+    <button data-page="privacy">Privacy Policy</button>
+    <button data-page="terms">Terms &amp; Conditions</button>
+    <button data-page="about">Tentang</button>
+    <button data-page="contact">Kontak</button>
+    <button data-page="guide">Panduan</button>
+  </div>
+  <div>© <span id="year"></span> Order Manager PRO+. Semua hak dilindungi.</div>
+</footer>
+
+<!-- Dialog edit -->
+<dialog id="dlgEdit">
+  <div class="dlg-head">✏️ Edit order</div>
+  <div class="dlg-body">
+    <label for="editText">Isi order (termasuk deadline)</label>
+    <input id="editText" type="text" autocomplete="off">
+    <label for="editNote">Catatan tambahan</label>
+    <textarea id="editNote" placeholder="Opsional"></textarea>
+  </div>
+  <div class="dlg-foot">
+    <button class="btn btn-ghost" id="editCancel">Batal</button>
+    <button class="btn btn-primary" id="editSave">Simpan</button>
+  </div>
+</dialog>
+
+<!-- Toast -->
+<div id="toast" class="toast" role="status" aria-live="polite">
+  <span id="toastText"></span>
+  <button id="toastUndo">↩ Undo</button>
+</div>
+
+<script src="js/parser.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
