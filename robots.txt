@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://rekap-q.vercel.app/sitemap.xml
